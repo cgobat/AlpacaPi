@@ -22,6 +22,15 @@
 - **Smart Exclusions**: Exclude problematic files from builds rather than fixing every issue individually
 - **Phase-based Approach**: Focus on core functionality first, defer complex integrations to later phases
 
+### Directory Structure Best Practices
+- **Research First**: Always check what devices a manufacturer actually makes before creating folders
+- **Minimal Structure**: Only create subfolders for device types that actually exist in the codebase
+- **Manufacturer-Specific**: Each manufacturer folder should only contain devices they actually produce
+- **Avoid Over-Engineering**: Don't create empty placeholder folders "for future use" - add them when needed
+- **Verify Before Creating**: Check existing source files to understand what drivers actually exist
+- **Clean Up Mistakes**: If you create too many folders, clean them up immediately rather than leaving them
+- **Logical Grouping**: Group by actual functionality, not theoretical possibilities
+
 ### Git Workflow
 - **AI Assistant**: Generates commit messages when requested, but does NOT push code
 - **User**: Uses GitHub Desktop to copy/paste commit messages and execute pushes
