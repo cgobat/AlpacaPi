@@ -21,6 +21,20 @@ Redistributions of this source code must retain this copyright notice.
 
 More documentation can be found at  https://msproul.github.io/AlpacaPi/
 
+## New Directory Structure (Phase 1)
+
+This fork reorganizes the project to a modern layout:
+
+- `include/alpacapi/` — public headers
+- `src/` — internal sources (core, net, proto, util)
+- `drivers/` — device adapters
+- `examples/` — minimal runnable examples
+- `scripts/` — tooling (to be cleaned in Phase 2)
+- `tests/` — unit/integration tests (Phase 2)
+- `docs/` — documentation (Phase 2)
+
+> No functional changes in Phase 1 — this is a tree-only refactor.
+
 ===================================================
 
 ## Getting started:

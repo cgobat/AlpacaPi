@@ -1,0 +1,796 @@
+//*****************************************************************************
+//*
+//*	Name:			discovery_lib.c
+//*
+//*	Author:			Mark Sproul (C) 2019-2020
+//*
+//*	Description:	Alpaca discovery library
+//*
+//*	Limitations:
+//*
+//*	Usage notes:
+//*****************************************************************************
+//*	Edit History
+//*****************************************************************************
+//*	<MLS>	=	Mark L Sproul
+//*****************************************************************************
+//*	Feb 11,	2020	<MLS> Created discover_lib.c to re-organize code for multiple apps
+//*	Feb 23,	2020	<MLS> Added LookupNames() to link /etc/hosts to ip addresses
+//*	Mar  4,	2020	<MLS> Made GetJsonResponse() handle large buffers
+//*	Apr 30,	2020	<MLS> Moved GetJsonResponse() & SendPutCommand() to new file
+//*	Jun 10,	2020	<MLS> Added _INCLUDE_WIRELESS_SUBNET_ compile option flag
+//*	Jun  2,	2020	<MLS> Added timeout to SendGetRequest()
+//*	Aug 13,	2020	<MLS> Added ReadExternalIPlist()
+//*	Aug 13,	2020	<MLS> Added Added ability to read external IP address from text file
+//*	Jun 24,	2020	<MLS> Removed _INCLUDE_WIRELESS_SUBNET_
+//*	Jun 29,	2023	<MLS> Fixed bug AddUnitToList(): 2 ports on same IP not recognized
+//*	Jul  8,	2023	<MLS> Added DumpRemoteDevice()
+//*	Apr 14,	2024	<MLS> Added DumpAlpacaUnit()
+//*****************************************************************************
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <errno.h>
+#include <ctype.h>
+
+#define _ENABLE_CONSOLE_DEBUG_
+#include	"../util/ConsoleDebug.h"
+
+#include	"../util/json_parse.h"
+
+#define kAlpacaDiscoveryPORT	32227
+
+#define	kReceiveBufferSize	1550
+
+#include	"alpaca_defs.h"
+#include	"discovery_lib.h"
+#include	"sendrequest_lib.h"
+
+
+
+//*	this is IP addresses:ports
+TYPE_ALPACA_UNIT	gAlpacaUnitList[kMaxAlpacaIPaddrCnt];
+int					gAlpacaUnitCnt	=	0;
+
+//*	this is alpaca devices
+TYPE_REMOTE_DEV		gAlpacaDiscoveredList[kMaxAlpacaDeviceCnt];
+int					gAlpacaDiscoveredCnt	=	0;
+
+static	int					gBroadcastSock;
+static	struct sockaddr_in	gServer_addr;
+static	struct sockaddr_in	gClient_addr;
+
+//*****************************************************************************
+static void	InitArrays(void)
+{
+int		iii;
+
+	CONSOLE_DEBUG_W_NUM("kMaxAlpacaIPaddrCnt\t=", kMaxAlpacaIPaddrCnt);
+	CONSOLE_DEBUG_W_NUM("kMaxAlpacaDeviceCnt\t=", kMaxAlpacaDeviceCnt);
+	for (iii=0; iii<kMaxAlpacaIPaddrCnt; iii++)
+	{
+		memset(&gAlpacaUnitList[iii], 0, sizeof(TYPE_ALPACA_UNIT));
+		gAlpacaUnitList[iii].displayGraph	=	true;
+	}
+	for (iii=0; iii<kMaxAlpacaDeviceCnt; iii++)
+	{
+		memset(&gAlpacaDiscoveredList[iii], 0, sizeof(TYPE_REMOTE_DEV));
+	}
+	gAlpacaUnitCnt			=	0;
+	gAlpacaDiscoveredCnt	=	0;
+}
+
+//*****************************************************************************
+bool	SetupBroadcast(void)
+{
+int				setOptRetCode;
+int				bindRetCode;
+struct timeval	timeoutLength;
+bool			success	=	true;
+int				argValue;
+char			ipAddressStr[INET_ADDRSTRLEN];
+
+	CONSOLE_DEBUG("*********************************************************");
+	CONSOLE_DEBUG(__FUNCTION__);
+	InitArrays();
+
+	gBroadcastSock	=	socket(AF_INET, SOCK_DGRAM, 0);
+	if (gBroadcastSock  < 0)
+	{
+		perror("socket creation failed");
+		exit(EXIT_FAILURE);
+	}
+
+
+	memset(&gServer_addr, '\0', sizeof(struct sockaddr_in));
+	gServer_addr.sin_family			=	AF_INET;
+	gServer_addr.sin_port			=	htons(kAlpacaDiscoveryPORT);
+	gServer_addr.sin_addr.s_addr	=	htonl(INADDR_BROADCAST);
+
+	gClient_addr.sin_family			=	AF_INET;
+	gClient_addr.sin_addr.s_addr	=	htonl(INADDR_ANY);
+	gClient_addr.sin_port			=	htons(0);
+
+	inet_ntop(AF_INET, &(gServer_addr.sin_addr), ipAddressStr, INET_ADDRSTRLEN);
+	CONSOLE_DEBUG_W_STR("gServer_addr.sin_addr", ipAddressStr);
+
+	inet_ntop(AF_INET, &(gClient_addr.sin_addr), ipAddressStr, INET_ADDRSTRLEN);
+	CONSOLE_DEBUG_W_STR("gClient_addr.sin_addr", ipAddressStr);
+
+	argValue		=	1;
+	setOptRetCode	=	setsockopt(gBroadcastSock, SOL_SOCKET, (SO_BROADCAST), &argValue, sizeof(int));
+	if (setOptRetCode < 0)
+	{
+		perror("setsockopt(SO_BROADCAST) failed");
+		success	=	false;
+	}
+
+	//*	set a timeout
+	timeoutLength.tv_sec	=	2;
+	timeoutLength.tv_usec	=	0;
+	setOptRetCode			=	setsockopt(	gBroadcastSock,
+											SOL_SOCKET,
+											SO_RCVTIMEO,
+											&timeoutLength,
+											sizeof(timeoutLength));
+
+
+	bindRetCode	=	bind(gBroadcastSock, (const struct sockaddr *)&gClient_addr, sizeof(gClient_addr));
+	if (bindRetCode < 0)
+	{
+		perror("bind failed");
+		exit(EXIT_FAILURE);
+	}
+
+	return(success);
+}
+
+//*****************************************************************************
+//*	a device is an individual Alpaca device, can be more than one per IP address
+//*****************************************************************************
+static void	UpdateRemoteList(TYPE_REMOTE_DEV *newRemoteDevice)
+{
+int		iii;
+bool	newDevice;
+
+//	CONSOLE_DEBUG(__FUNCTION__);
+	//*	look to see if it is already in the list
+	newDevice	=	true;
+	for (iii=0; iii<gAlpacaDiscoveredCnt; iii++)
+	{
+		//*	check to see if it is already in the list
+		if ((newRemoteDevice->deviceAddress.sin_addr.s_addr == gAlpacaDiscoveredList[iii].deviceAddress.sin_addr.s_addr)
+			&& (strcmp(newRemoteDevice->deviceTypeStr,	gAlpacaDiscoveredList[iii].deviceTypeStr) == 0)
+			&& (strcmp(newRemoteDevice->deviceNameStr,	gAlpacaDiscoveredList[iii].deviceNameStr) == 0)
+			&& (newRemoteDevice->alpacaDeviceNum == gAlpacaDiscoveredList[iii].alpacaDeviceNum)
+			)
+		{
+			//*	yep, its already here, dont bother
+			newDevice	=	false;
+			break;
+		}
+		//*	I dont want the management device type in the list
+		if (strcmp(newRemoteDevice->deviceTypeStr, "management") == 0)
+		{
+			//*	its a management devices, dont bother
+			newDevice	=	false;
+			break;
+		}
+	}
+	if (newDevice)
+	{
+		//*	we have a new devices, add it in (if there's room)
+		if (gAlpacaDiscoveredCnt < kMaxAlpacaDeviceCnt)
+		{
+			gAlpacaDiscoveredList[gAlpacaDiscoveredCnt]	=	*newRemoteDevice;
+			gAlpacaDiscoveredCnt++;
+		}
+	}
+}
+
+//*****************************************************************************
+void	ExtractDevicesFromJSON(SJP_Parser_t *jsonParser, TYPE_ALPACA_UNIT *theUnit)
+{
+TYPE_REMOTE_DEV	myRemoteDevice;
+int				iii;
+char			myVersionString[64];
+
+//	CONSOLE_DEBUG(__FUNCTION__);
+	memset(&myRemoteDevice, 0, sizeof(TYPE_REMOTE_DEV));
+	memset(myVersionString, 0, sizeof(myVersionString));
+	strcpy(myVersionString, "??");
+	for (iii=0; iii<jsonParser->tokenCount_Data; iii++)
+	{
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "VERSION") == 0)
+		{
+			strcpy(myVersionString, jsonParser->dataList[iii].valueString);
+		}
+
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "DEVICETYPE") == 0)
+		{
+			strcpy(myRemoteDevice.deviceTypeStr, jsonParser->dataList[iii].valueString);
+		}
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "DEVICENAME") == 0)
+		{
+			strcpy(myRemoteDevice.deviceNameStr, jsonParser->dataList[iii].valueString);
+		}
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "DEVICENUMBER") == 0)
+		{
+			myRemoteDevice.alpacaDeviceNum	=	atoi(jsonParser->dataList[iii].valueString);
+		}
+
+		//------------------------------------
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "ARRAY-NEXT") == 0)
+		{
+			myRemoteDevice.deviceAddress	=	theUnit->deviceAddress;
+			myRemoteDevice.port				=	theUnit->port;
+			strcpy(myRemoteDevice.versionString, myVersionString);
+			strcpy(myRemoteDevice.hostName,		theUnit->hostName);
+			UpdateRemoteList(&myRemoteDevice);
+
+			memset(&myRemoteDevice, 0, sizeof(TYPE_REMOTE_DEV));
+
+		}
+	}
+}
+
+//*****************************************************************************
+static void	SendGetRequest(TYPE_ALPACA_UNIT *theUnit, const char *sendData)
+{
+int					socket_desc;
+struct sockaddr_in	remoteDev;
+int					connRetCode;
+int					sendRetCode;
+int					closeRetCode;
+int					shutDownRetCode;
+int					recvByteCnt;
+char				returnedData[kReadBuffLen];
+char				xmitBuffer[kReadBuffLen];
+SJP_Parser_t		jsonParser;
+char				ipAddrSt[32];
+struct timeval		timeoutLength;
+int					setOptRetCode;
+
+	CONSOLE_DEBUG(__FUNCTION__);
+	CONSOLE_DEBUG_W_NUM("kReadBuffLen\t=", kReadBuffLen);
+
+	if (theUnit->deviceAddress.sin_addr.s_addr != 0)
+	{
+		inet_ntop(AF_INET, &(theUnit->deviceAddress.sin_addr), ipAddrSt, INET_ADDRSTRLEN);
+		CONSOLE_DEBUG_W_STR("Sending get request to", ipAddrSt);
+
+		socket_desc	=	socket(AF_INET , SOCK_STREAM , 0);
+		if (socket_desc >= 0)
+		{
+			//*	set a timeout
+			timeoutLength.tv_sec	=	1;
+			timeoutLength.tv_usec	=	0;
+			setOptRetCode			=	setsockopt(	socket_desc,
+													SOL_SOCKET,
+													SO_RCVTIMEO,
+													&timeoutLength,
+													sizeof(timeoutLength));
+			if (setOptRetCode < 0)
+			{
+				perror("setsockopt(SO_BROADCAST) failed");
+			}
+
+			remoteDev.sin_addr.s_addr	=	theUnit->deviceAddress.sin_addr.s_addr;
+			remoteDev.sin_family		=	AF_INET;
+			remoteDev.sin_port			=	htons(theUnit->port);
+			//*	Connect to remote device
+			connRetCode	=	connect(socket_desc , (struct sockaddr *)&remoteDev , sizeof(remoteDev));
+			if (connRetCode >= 0)
+			{
+				strcpy(xmitBuffer, "GET ");
+				strcat(xmitBuffer, sendData);
+
+				strcat(xmitBuffer, " HTTP/1.1");
+				strcat(xmitBuffer, "\r\n");
+				strcat(xmitBuffer, "Host: 127.0.0.1:6800");
+				strcat(xmitBuffer, "\r\n");
+				strcat(xmitBuffer, "Connection: keep-alive");
+				strcat(xmitBuffer, "\r\n");
+				strcat(xmitBuffer, "Accept: text/html,application/json");
+				strcat(xmitBuffer, "User-Agent: AlpacaPi");
+				strcat(xmitBuffer, "\r\n");
+				strcat(xmitBuffer, "\r\n");
+
+				sendRetCode	=	send(socket_desc , xmitBuffer , strlen(xmitBuffer) , 0);
+				if (sendRetCode >= 0)
+				{
+					recvByteCnt	=	recv(socket_desc, returnedData , kReadBuffLen , 0);
+					if (recvByteCnt >= 0)
+					{
+						returnedData[recvByteCnt]	=	0;
+	//					printf("%s\r\n", returnedData);
+						SJP_Init(&jsonParser);
+						SJP_ParseData(&jsonParser, returnedData);
+	//					SJP_DumpJsonData(&jsonParser);
+
+						ExtractDevicesFromJSON(&jsonParser, theUnit);
+					}
+				}
+				shutDownRetCode	=	shutdown(socket_desc, SHUT_RDWR);
+				if (shutDownRetCode != 0)
+				{
+					CONSOLE_DEBUG_W_NUM("shutDownRetCode\t=", shutDownRetCode);
+					CONSOLE_DEBUG_W_NUM("errno\t=", errno);
+				}
+				closeRetCode	=	close(socket_desc);
+				if (closeRetCode != 0)
+				{
+					CONSOLE_DEBUG_W_NUM("closeRetCode\t=", closeRetCode);
+					CONSOLE_DEBUG_W_NUM("errno\t=", errno);
+				}
+			}
+			else if (errno == ECONNREFUSED)
+			{
+				CONSOLE_DEBUG_W_NUM("connect refused", (theUnit->deviceAddress.sin_addr.s_addr >> 24));
+			}
+			else
+			{
+	//			CONSOLE_DEBUG("connect error");
+	//			CONSOLE_DEBUG_W_NUM("errno\t=", errno);
+			}
+		}
+	}
+	else
+	{
+		CONSOLE_DEBUG("Cannot sent request to 0.0.0.0");
+//		CONSOLE_ABORT(__FUNCTION__);
+	}
+}
+
+//*****************************************************************************
+static void	PollAllDevices(void)
+{
+int		iii;
+
+//	CONSOLE_DEBUG(__FUNCTION__);
+	for (iii=0; iii<gAlpacaUnitCnt; iii++)
+	{
+	//	SendGetRequest(&gAlpacaUnitList[iii], "/api/v1/management/0/configureddevices");
+		SendGetRequest(&gAlpacaUnitList[iii], "/management/v1/configureddevices");
+	//	usleep(100);
+	}
+}
+
+
+//*****************************************************************************
+//*	a unit is a single IP address that speaks alpaca
+//*****************************************************************************
+static void	AddUnitToList(struct sockaddr_in *deviceAddress, SJP_Parser_t *jsonParser)
+{
+int		iii;
+bool	newUnit;
+int		alpacaListenPort;
+
+//	CONSOLE_DEBUG(__FUNCTION__);
+
+	//------------------------------------------------
+	//*	find the alpaca port
+	alpacaListenPort	=	12345;
+	for (iii=0; iii<jsonParser->tokenCount_Data; iii++)
+	{
+		if (strcasecmp(jsonParser->dataList[iii].keyword, "ALPACAPORT") == 0)
+		{
+			alpacaListenPort	=	atoi(jsonParser->dataList[iii].valueString);
+		}
+	}
+
+	newUnit		=	true;
+	//*	check to see if this IP address is already in the list
+	for (iii=0; iii<gAlpacaUnitCnt; iii++)
+	{
+		if ((deviceAddress->sin_addr.s_addr == gAlpacaUnitList[iii].deviceAddress.sin_addr.s_addr) &&
+			(alpacaListenPort				==	gAlpacaUnitList[iii].port))
+		{
+			//*	yep, its already here, dont bother
+			newUnit	=	false;
+			break;
+		}
+	}
+
+	if (newUnit)
+	{
+		//*	add the new devices to our list
+//		CONSOLE_DEBUG("We have a new devices")
+		if (gAlpacaUnitCnt < kMaxAlpacaIPaddrCnt)
+		{
+			gAlpacaUnitList[gAlpacaUnitCnt].deviceAddress	=	*deviceAddress;
+			gAlpacaUnitList[gAlpacaUnitCnt].displayGraph	=	true;
+			//*	now find the alpaca port
+			for (iii=0; iii<jsonParser->tokenCount_Data; iii++)
+			{
+				if (strcasecmp(jsonParser->dataList[iii].keyword, "ALPACAPORT") == 0)
+				{
+					gAlpacaUnitList[gAlpacaUnitCnt].port	=	atoi(jsonParser->dataList[iii].valueString);
+				}
+			}
+			DumpAlpacaUnit(&gAlpacaUnitList[gAlpacaUnitCnt], __FUNCTION__);
+
+			gAlpacaUnitCnt++;
+		}
+	}
+
+//	CONSOLE_ABORT(__FUNCTION__);
+}
+
+//*****************************************************************************
+static int	DeviceSort(const void *e1, const void* e2)
+{
+int					retValue;
+TYPE_REMOTE_DEV		*entry1;
+TYPE_REMOTE_DEV		*entry2;
+uint32_t			address1;
+uint32_t			address2;
+
+	entry1		=	(TYPE_REMOTE_DEV *)e1;
+	entry2		=	(TYPE_REMOTE_DEV *)e2;
+
+	address1	=	entry1->deviceAddress.sin_addr.s_addr;
+	address1	=	((address1 & 0x0ff) << 24) +
+					(((address1 >> 8) & 0x0ff) << 16) +
+					(((address1 >> 16) & 0x0ff) << 8) +
+					(((address1 >> 24) & 0x0ff));
+
+	address2	=	entry2->deviceAddress.sin_addr.s_addr;
+	address2	=	((address2 & 0x0ff) << 24) +
+					(((address2 >> 8) & 0x0ff) << 16) +
+					(((address2 >> 16) & 0x0ff) << 8) +
+					(((address2 >> 24) & 0x0ff));
+
+	retValue	=	address1 - address2;
+//	retValue	=	entry1->deviceAddress.sin_addr.s_addr - entry2->deviceAddress.sin_addr.s_addr;
+	if (retValue == 0)
+	{
+		retValue	=	strcmp(entry1->deviceTypeStr, entry2->deviceTypeStr);
+	}
+	else
+	{
+	//	CONSOLE_DEBUG_W_HEX("addr1=",	address1);
+	//	CONSOLE_DEBUG_W_HEX("addr2=",	address2);
+	}
+	if (retValue == 0)
+	{
+		retValue	=	strcmp(entry1->deviceNameStr, entry2->deviceNameStr);
+	}
+	return(retValue);
+}
+
+//*****************************************************************************
+static	void PrintDeviceList(void)
+{
+int		ii;
+char	ipAddrSt[32];
+
+	CONSOLE_DEBUG(__FUNCTION__);
+	qsort(gAlpacaDiscoveredList, gAlpacaDiscoveredCnt, sizeof(TYPE_REMOTE_DEV), DeviceSort);
+
+	for (ii=0; ii<gAlpacaDiscoveredCnt; ii++)
+	{
+		if (ii> 0)
+		{
+			if (gAlpacaDiscoveredList[ii].deviceAddress.sin_addr.s_addr != gAlpacaDiscoveredList[ii-1].deviceAddress.sin_addr.s_addr)
+			{
+				printf("\r\n");
+			}
+		}
+		inet_ntop(AF_INET, &(gAlpacaDiscoveredList[ii].deviceAddress.sin_addr), ipAddrSt, INET_ADDRSTRLEN);
+
+		printf("%s\t",		ipAddrSt);
+
+		printf(":%d\t",		gAlpacaDiscoveredList[ii].port);
+
+		printf("%-20s\t",	gAlpacaDiscoveredList[ii].deviceTypeStr);
+		printf("%-20s\t",	gAlpacaDiscoveredList[ii].deviceNameStr);
+		printf("%4d\t",		gAlpacaDiscoveredList[ii].alpacaDeviceNum);
+		printf("%s\t",		gAlpacaDiscoveredList[ii].versionString);
+
+		printf("\r\n");
+	}
+	fflush(stdout);
+}
+
+//*****************************************************************************
+//*	read the /etc/hosts file and see if there are names for the address in the list
+//*****************************************************************************
+static void	LookupNames(void)
+{
+
+FILE	*filePointer;
+char	lineBuff[256];
+int		slen;
+int		ccc;
+int		iii;
+char	theChar;
+char	ipString[48];
+char	hostAddrString[48];
+char	hostName[48];
+char	hostsFileName[]	=	"/etc/hosts";
+
+	CONSOLE_DEBUG(__FUNCTION__);
+
+	filePointer	=	fopen(hostsFileName, "r");
+	if (filePointer != NULL)
+	{
+		while (fgets(lineBuff, 200, filePointer))
+		{
+			hostAddrString[0]	=	0;
+			hostName[0]			=	0;
+			slen	=	strlen(lineBuff);
+			if ((slen > 10) && (lineBuff[0] != '#'))
+			{
+				//*	extract the address string from the hosts file
+				ccc	=	0;
+				for (iii=0; iii<slen; iii++)
+				{
+					theChar	=	lineBuff[iii];
+					if (isdigit(theChar) || (theChar == '.'))
+					{
+						hostAddrString[ccc++]	=	theChar;
+						hostAddrString[ccc]		=	0;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				//*	now find the name
+				while ((lineBuff[iii] <= 0x20) && (lineBuff[iii] > 0))
+				{
+					iii++;
+				}
+				//*	we should now be pointing at the name
+ 				ccc	=	0;
+				while (iii<slen)
+				{
+					theChar	=	lineBuff[iii];
+					if (theChar > 0x20)
+					{
+						hostName[ccc++]	=	theChar;
+						hostName[ccc]	=	0;
+					}
+					iii++;
+				}
+
+				//*	now look through the address list and see if we have any matches
+				if ((strlen(hostAddrString) > 1) && (strlen(hostName) > 1))
+				{
+					for (iii=0; iii<gAlpacaUnitCnt; iii++)
+					{
+						PrintIPaddressToString(gAlpacaUnitList[iii].deviceAddress.sin_addr.s_addr, ipString);
+						if (strcmp(hostAddrString, ipString) == 0)
+						{
+							//*	they match, update the unit entry
+							strcpy(gAlpacaUnitList[iii].hostName, hostName);
+//							CONSOLE_DEBUG_W_STR("gAlpacaUnitList[iii].hostName\t=", gAlpacaUnitList[iii].hostName);
+							break;
+						}
+					}
+				}
+			}
+		}
+		fclose(filePointer);
+	}
+	else
+	{
+		CONSOLE_DEBUG_W_STR("failed to open", hostsFileName);
+	}
+//	exit(0);
+}
+
+
+#if 0
+//*****************************************************************************
+void	AddAlpacaTestSiteToList(void)
+{
+TYPE_REMOTE_DEV		myRemoteDevice;
+char				myVersionString[64];
+struct sockaddr_in	deviceAddress;
+
+	CONSOLE_DEBUG(__FUNCTION__);
+
+	memset(&myRemoteDevice, 0, sizeof(TYPE_REMOTE_DEV));
+	memset(myVersionString, 0, sizeof(myVersionString));
+
+//curl -X GET "http://52.86.219.240/ASCOMInitiative/api/v1/camera/0/imagearray?ClientID=1&ClientTransactionID=1234" -H  "accept: application/json"
+
+
+	deviceAddress.sin_addr.s_addr	=	htonl((52 << 24) + (86 << 16) + (219 << 8) + 240);
+
+
+	myRemoteDevice.deviceAddress			=	deviceAddress;
+	myRemoteDevice.port						=	443;
+	strcpy(myRemoteDevice.versionString,	"virtserver");
+	strcpy(myRemoteDevice.hostName,			"Alpaca");
+	strcpy(myRemoteDevice.webPrefixString,	"ASCOMInitiative");
+
+	strcpy(myRemoteDevice.deviceTypeStr, "Camera");
+	strcpy(myRemoteDevice.deviceNameStr, "Test Camera");
+	myRemoteDevice.alpacaDeviceNum	=	0;
+
+
+	UpdateRemoteList(&myRemoteDevice);
+
+}
+#endif // 0
+
+//*****************************************************************************
+//*	returns the number of IP addresses found that are "alpaca"
+//*****************************************************************************
+int	SendAlpacaQueryBroadcast(void)
+{
+char				broadCastMsg[]	=	"alpacadiscovery1";
+struct sockaddr_in	from;
+int					rcvCnt;
+unsigned int		fromlen;
+int					sendtoRetCode;
+char				readBuffer[kReceiveBufferSize + 1];
+char				ipAddressStr[INET_ADDRSTRLEN];
+SJP_Parser_t		jsonParser;
+int					timeOutCntr;
+int					alpacaIPaddrCnt;
+//int					bytesWritten;
+
+	CONSOLE_DEBUG(__FUNCTION__);
+
+	alpacaIPaddrCnt	=	0;
+
+	//*	send the broadcast message to everyone
+	sendtoRetCode	=	sendto(	gBroadcastSock,
+								broadCastMsg,
+								strlen(broadCastMsg),
+								0,
+								(struct sockaddr *)&gServer_addr,
+								sizeof(struct sockaddr_in));
+	if (sendtoRetCode < 0)
+	{
+		CONSOLE_DEBUG("sendto returned error");
+		perror("sendto");
+	}
+	timeOutCntr	=	0;
+	fromlen	=	sizeof(struct sockaddr_in);
+	while (timeOutCntr < 2)
+	{
+		rcvCnt	=	recvfrom(gBroadcastSock, readBuffer, kReceiveBufferSize, 0, (struct sockaddr *)&from, &fromlen);
+		if (rcvCnt > 0)
+		{
+			readBuffer[rcvCnt]	=	0;
+//				CONSOLE_DEBUG("We have data");
+//				CONSOLE_DEBUG_W_STR("readBuffer=", readBuffer);
+			SJP_Init(&jsonParser);
+			SJP_ParseData(&jsonParser, readBuffer);
+//			SJP_DumpJsonData(&jsonParser);
+
+			AddUnitToList(&from, &jsonParser);
+
+			inet_ntop(AF_INET, &(from.sin_addr), ipAddressStr, INET_ADDRSTRLEN);
+
+//			bytesWritten	=	0;
+//			bytesWritten	+=	write(1, readBuffer, rcvCnt);
+//			bytesWritten	+=	write(1, " ", 1);
+//			bytesWritten	+=	write(1, ipAddressStr, strlen(ipAddressStr));
+//			bytesWritten	+=	write(1, "\n", 1);
+			printf("%s %s\n", readBuffer, ipAddressStr);
+		}
+		else if (rcvCnt == 0)
+		{
+			printf("no response\r\n");
+		}
+		else
+		{
+		//	perror("recvfrom");
+			timeOutCntr++;
+		}
+//		CONSOLE_DEBUG_W_HEX("from.sin_addr=", from.sin_addr.s_addr);
+//		CONSOLE_DEBUG_W_NUM("from.sin_addr=", ((from.sin_addr.s_addr >> 24) & 0x0ff));
+//		CONSOLE_DEBUG_W_NUM("from.sin_addr=", ((from.sin_addr.s_addr >> 16) & 0x0ff));
+//		CONSOLE_DEBUG_W_NUM("from.sin_addr=", ((from.sin_addr.s_addr >> 8) & 0x0ff));
+//		CONSOLE_DEBUG_W_NUM("from.sin_addr=", ((from.sin_addr.s_addr) & 0x0ff));
+
+	}
+
+	ReadExternalIPlist();
+
+	//*	find the names that go along with the addresses
+	LookupNames();
+
+
+	PollAllDevices();
+//	AddAlpacaTestSiteToList();
+
+//	PrintDeviceList();
+
+	return(alpacaIPaddrCnt);
+}
+
+//*****************************************************************************
+void	ReadExternalIPlist(void)
+{
+FILE				*filePointer;
+char				lineBuff[256];
+char				outputIPaddr[256];
+int					iii;
+int					slen;
+char				fileName[]	=	"external_ip_list.txt";
+SJP_Parser_t		jsonParser;
+struct sockaddr_in	from;
+
+	CONSOLE_DEBUG(__FUNCTION__);
+
+	//*	see if there is a file listing extra IP address
+	filePointer	=	fopen(fileName, "r");
+	if (filePointer != NULL)
+	{
+		while (fgets(lineBuff, 200, filePointer))
+		{
+			//*	get rid of the trailing CR/LF
+			slen	=	strlen(lineBuff);
+			for (iii=0; iii<slen; iii++)
+			{
+				if ((lineBuff[iii] == 0x0d) || (lineBuff[iii] == 0x0a))
+				{
+					lineBuff[iii]	=	0;
+					break;
+				}
+			}
+			CONSOLE_DEBUG_W_STR("External IP address\t=",		lineBuff);
+			slen	=	strlen(lineBuff);
+			if ((slen > 6) && (lineBuff[0] != '#'))
+			{
+				SJP_Init(&jsonParser);
+				inet_pton(AF_INET, lineBuff, &(from.sin_addr));
+
+				inet_ntop(AF_INET, &(from.sin_addr), outputIPaddr, INET_ADDRSTRLEN);
+				CONSOLE_DEBUG_W_STR("outputIPaddr\t\t=",		outputIPaddr);
+
+				strcpy(jsonParser.dataList[0].keyword, "ALPACAPORT");
+				strcpy(jsonParser.dataList[0].valueString, "6800");
+				jsonParser.tokenCount_Data	=	1;
+
+//				SJP_DumpJsonData(&jsonParser);
+				AddUnitToList(&from, &jsonParser);
+			}
+		}
+		fclose(filePointer);
+	}
+}
+
+//*****************************************************************************
+void	DumpRemoteDevice(TYPE_REMOTE_DEV *alpacaDevice, const char *callingFunction)
+{
+	CONSOLE_DEBUG("----------------------------------------------");
+	CONSOLE_DEBUG_W_STR("Called from:", callingFunction);
+	CONSOLE_DEBUG_W_BOOL("validEntry     \t=",	alpacaDevice->validEntry);
+	CONSOLE_DEBUG_W_BOOL("onLine         \t=",	alpacaDevice->onLine);
+	CONSOLE_DEBUG_W_NUM("port            \t=",	alpacaDevice->port);
+	CONSOLE_DEBUG_W_STR("hostName        \t=",	alpacaDevice->hostName);
+	CONSOLE_DEBUG_W_NUM("deviceTypeEnum  \t=",	alpacaDevice->deviceTypeEnum);
+	CONSOLE_DEBUG_W_STR("deviceNameStr   \t=",	alpacaDevice->deviceTypeStr);
+	CONSOLE_DEBUG_W_STR("deviceTypeStr   \t=",	alpacaDevice->deviceNameStr);
+	CONSOLE_DEBUG_W_STR("versionString   \t=",	alpacaDevice->versionString);
+	CONSOLE_DEBUG_W_NUM("alpacaDeviceNum \t=",	alpacaDevice->interfaceVersion);
+	CONSOLE_DEBUG_W_NUM("interfaceVersion\t=",	alpacaDevice->alpacaDeviceNum);
+	CONSOLE_DEBUG_W_NUM("notSeenCounter  \t=",	alpacaDevice->notSeenCounter);
+}
+
+//*****************************************************************************
+void	DumpAlpacaUnit(TYPE_ALPACA_UNIT *alpacaUnit, const char *callingFunction)
+{
+	CONSOLE_DEBUG_W_STR(	"hostName    \t=",	alpacaUnit->hostName);
+	CONSOLE_DEBUG_W_NUM(	"Port        \t=",	alpacaUnit->displayGraph);
+	CONSOLE_DEBUG_W_BOOL(	"displayGraph\t=",	alpacaUnit->displayGraph);
+}
+

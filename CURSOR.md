@@ -1,0 +1,57 @@
+# CURSOR.md
+
+## Phase 1: Restructure to Modern C++ Standards ✅ COMPLETED
+- Create proper directory structure: `cmake/`, `include/alpacapi/`, `src/{core,net,proto,util}/`, `drivers/`, `examples/`, `tests/`, `scripts/`, `docs/`
+- Move public headers to `include/alpacapi/`; internal headers/sources to `src/**`; device code to `drivers/**`; demos to `examples/**`
+- Preserve history with `git mv`. Do NOT modify logic or symbols.
+- Add minimal CMakeLists.txt that builds a `alpacapi` static lib with C++17 and an `example_discover` binary.
+- Ensure includes use `alpacapi/...` for public headers.
+- Keep Alpaca protocol surface stable; internal refactors must not change behavior in Phase 1.
+
+## Development Workflow: Vibe Coding 🤝
+- **AI Assistant**: Handles all code changes, refactoring, and implementation
+- **User**: Focuses on testing, verification, and providing feedback
+- **Collaborative approach**: AI does the heavy lifting, user ensures quality and direction
+- **Efficient development**: User can focus on testing while AI handles the coding work
+- **Real-time feedback**: User tests changes and provides guidance for next steps
+
+### Efficiency Guidelines
+- **Batch Operations**: AI should group related changes into single tool calls when possible
+- **Bulk Fixes**: Use `replace_all` for systematic changes across multiple files
+- **Minimal Tool Calls**: Prioritize fewer, more comprehensive changes over many small ones
+- **Smart Exclusions**: Exclude problematic files from builds rather than fixing every issue individually
+- **Phase-based Approach**: Focus on core functionality first, defer complex integrations to later phases
+
+### Git Workflow
+- **AI Assistant**: Generates commit messages when requested, but does NOT push code
+- **User**: Uses GitHub Desktop to copy/paste commit messages and execute pushes
+- **Commit Process**: AI provides commit message → User copies to GitHub Desktop → User executes push
+- **No AI Git Operations**: AI only modifies files, never runs `git push` or similar commands
+
+### Testing & Verification
+- **User Responsibility**: Test all changes before committing
+- **Build Testing**: Verify CMake builds successfully
+- **Functionality Testing**: Ensure Alpaca protocol surface remains stable
+- **Regression Testing**: Check that existing features still work
+- **AI Support**: AI can help debug issues found during testing
+
+### Development Priorities
+- **Phase 1**: ✅ Complete - Modern C++ structure and organization
+- **Phase 2**: Code modernization (C++17 features, RAII, smart pointers)
+- **Phase 3**: Performance optimization and advanced features
+- **Maintenance**: Bug fixes and incremental improvements
+
+## C++ Coding Standards
+	•	Use C++17 (no compiler extensions).
+	•	Turn on warnings: -Wall -Wextra -Wpedantic and treat as errors in CI (-Werror there only).
+	•	Prefer RAII + smart pointers (std::unique_ptr by default, std::shared_ptr only when ownership is shared).
+	•	No raw new/delete; no C-style casts; use static_cast/reinterpret_cast when necessary.
+	•	Const-correctness; pass by const& for non-trivial types; move where appropriate.
+	•	Use STL types (std::string, std::vector, std::array, std::optional, std::chrono) over custom/legacy.
+	•	Functions: narrow interfaces, noexcept where it's true; avoid global mutable state.
+	•	Namespaces: alpacapi::<module>; no using namespace in headers.
+	•	Headers: include guards via #pragma once; minimize includes; prefer forward decls.
+	•	Logging/errors: return expected-style via tl::expected (if added) or error enums + status objects; do not throw for normal flow.
+	•	Threading: use <thread>, <mutex>, <future>; avoid non-portable APIs.
+	•	Formatting/lint: clang-format + clang-tidy (modernize/readability/bugprone/cppcoreguidelines).
+	•	Keep Alpaca protocol surface stable; internal refactors must not change behavior in Phase 1.
