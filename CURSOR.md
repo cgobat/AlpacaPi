@@ -46,9 +46,23 @@
 
 ### Development Priorities
 - **Phase 1**: ✅ Complete - Modern C++ structure and organization
-- **Phase 2**: Code modernization (C++17 features, RAII, smart pointers)
-- **Phase 3**: Performance optimization and advanced features
+- **Phase 2**: Script architecture and modular installation system
+- **Phase 3**: Code modernization (C++17 features, RAII, smart pointers)
+- **Phase 4**: Performance optimization and advanced features
 - **Maintenance**: Bug fixes and incremental improvements
+
+### Script Development Focus
+- **Primary Goal**: NINA-compatible AlpacaPi deployment on Raspberry Pi
+- **Secondary Goal**: Modular driver installation system
+- **Current Status**: Scripts need updating for new directory structure
+- **Next Steps**: Create interactive installation script with driver selection
+
+### pi-gen Integration
+- **Goal**: Create custom Raspberry Pi OS images with AlpacaPi pre-installed
+- **Status**: ✅ Complete - Full pi-gen integration setup
+- **Features**: Docker-based builds, modular driver selection, NINA-optimized
+- **Location**: `pi-gen/` directory with complete build system
+- **Documentation**: See `SCRIPT.md` for detailed script architecture and goals
 
 ## C++ Coding Standards
 	•	Use C++17 (no compiler extensions).

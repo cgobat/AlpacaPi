@@ -1,0 +1,51 @@
+# AlpacaPi Custom Raspberry Pi OS Configuration
+# Based on pi-gen configuration format
+
+# Image name and description
+IMG_NAME='AlpacaPi'
+IMG_DESC='Raspberry Pi OS with AlpacaPi for NINA Control'
+
+# Build options
+ENABLE_SSH=1
+ENABLE_VNC=0
+ENABLE_DESKTOP=0
+ENABLE_WIFI=1
+ENABLE_BLUETOOTH=0
+
+# AlpacaPi specific options
+ALPACAPI_DRIVERS="zwo atik qhy"
+ALPACAPI_BUILD_TYPE="minimal"
+ALPACAPI_AUTO_START=1
+ALPACAPI_DISCOVERY_PORT=32227
+
+# System configuration
+LOCALE_DEFAULT="en_US.UTF-8"
+TARGET_HOSTNAME="alpacapi"
+KEYBOARD_KEYMAP="us"
+TIMEZONE_DEFAULT="UTC"
+
+# Network configuration
+WPA_ESSID=""
+WPA_PASSWORD=""
+WPA_COUNTRY="US"
+
+# User configuration
+FIRST_USER_NAME="pi"
+FIRST_USER_PASS="raspberry"
+ENABLE_SSH_KEY_PASSPHRASE=0
+
+# Image size and compression
+IMG_COMPRESSION="xz"
+IMG_FILETYPE="img"
+
+# Build stages to include
+STAGE_LIST="stage0 stage1 stage2 stage-alpacapi"
+STAGE_ALPACAPI="stage-alpacapi"
+
+# Skip stages (empty means include all)
+SKIP_STAGES=""
+SKIP_IMAGES=""
+
+# Build output
+DEPLOY_DIR="deploy"
+WORK_DIR="work"

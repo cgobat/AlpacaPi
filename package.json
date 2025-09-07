@@ -1,0 +1,60 @@
+{
+  "name": "alpacapi",
+  "version": "1.0.0",
+  "description": "Professional astronomy control software using the Alpaca protocol on Raspberry Pi",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "build:debug": "node build.js --debug",
+    "build:release": "node build.js --release",
+    "build:pi": "node build.js --target pi",
+    "build:pi-gen": "node build.js --pi-gen",
+    "test": "node test.js",
+    "clean": "node clean.js",
+    "clean:artifacts": "node clean.js --artifacts --force",
+    "clean:all": "node clean.js --all --force",
+    "lint": "echo 'Linting not implemented yet' && exit 0",
+    "docker:build": "node docker-build.js",
+    "docker:pi-gen": "node docker-build.js --pi-gen",
+    "install:dev": "npm install",
+    "setup": "node setup.js"
+  },
+  "keywords": [
+    "astronomy",
+    "alpaca",
+    "ascom",
+    "raspberry-pi",
+    "camera",
+    "telescope",
+    "observatory"
+  ],
+  "author": "Mark Sproul <msproul@skychariot.com>",
+  "license": "Custom",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "devDependencies": {
+    "archiver": "^5.3.1",
+    "chalk": "^4.1.2",
+    "commander": "^9.4.1",
+    "cross-spawn": "^7.0.3",
+    "fs-extra": "^11.1.1",
+    "glob": "^10.3.10",
+    "inquirer": "^8.2.5",
+    "ora": "^5.4.1",
+    "yargs": "^17.7.2"
+  },
+  "dependencies": {
+    "dockerode": "^4.0.7",
+    "tar": "^6.1.13"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/AlpacaPi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/AlpacaPi/issues"
+  },
+  "homepage": "https://msproul.github.io/AlpacaPi/"
+}
