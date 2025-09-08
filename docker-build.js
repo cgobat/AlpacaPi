@@ -270,7 +270,7 @@ class DockerBuilder {
   async createPlatformDockerfile(platform) {
     const dockerfile = `
 # AlpacaPi Builder for ${platform}
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC

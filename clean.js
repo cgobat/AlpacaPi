@@ -167,41 +167,38 @@ class AlpacaPiCleaner {
       const spinner = ora('Cleaning Docker artifacts').start();
       
       try {
-        // Remove Docker images
         const { execSync } = require('child_process');
         
-        // List and remove AlpacaPi-related images
+        // Stop all running containers
         try {
-          const images = execSync('docker images --format "{{.Repository}}:{{.Tag}}" | grep alpacapi', { encoding: 'utf8' });
-          const imageList = images.trim().split('\n').filter(img => img.length > 0);
-          
-          for (const image of imageList) {
-            try {
-              execSync(`docker rmi ${image}`, { stdio: 'ignore' });
-              this.cleanedItems.push(`Docker image: ${image}`);
-            } catch (error) {
-              this.log(`Error removing Docker image ${image}: ${error.message}`, 'warning');
-            }
-          }
+          execSync('docker stop $(docker ps -aq) 2>/dev/null || true', { stdio: 'ignore' });
+          this.cleanedItems.push('Stopped all Docker containers');
         } catch (error) {
-          // No images found, that's fine
+          // No containers to stop
         }
         
-        // Remove Docker containers
+        // Remove all containers
         try {
-          const containers = execSync('docker ps -a --format "{{.Names}}" | grep alpacapi', { encoding: 'utf8' });
-          const containerList = containers.trim().split('\n').filter(container => container.length > 0);
-          
-          for (const container of containerList) {
-            try {
-              execSync(`docker rm -f ${container}`, { stdio: 'ignore' });
-              this.cleanedItems.push(`Docker container: ${container}`);
-            } catch (error) {
-              this.log(`Error removing Docker container ${container}: ${error.message}`, 'warning');
-            }
-          }
+          execSync('docker rm $(docker ps -aq) 2>/dev/null || true', { stdio: 'ignore' });
+          this.cleanedItems.push('Removed all Docker containers');
         } catch (error) {
-          // No containers found, that's fine
+          // No containers to remove
+        }
+        
+        // Remove all images
+        try {
+          execSync('docker rmi $(docker images -q) 2>/dev/null || true', { stdio: 'ignore' });
+          this.cleanedItems.push('Removed all Docker images');
+        } catch (error) {
+          // No images to remove
+        }
+        
+        // Clean up Docker system (volumes, networks, etc.)
+        try {
+          execSync('docker system prune -a -f', { stdio: 'ignore' });
+          this.cleanedItems.push('Cleaned Docker system (volumes, networks, etc.)');
+        } catch (error) {
+          this.log(`Docker system prune error: ${error.message}`, 'warning');
         }
         
         spinner.succeed('Docker artifacts cleaned');
@@ -228,6 +225,30 @@ class AlpacaPiCleaner {
       // Clean pi-gen build artifacts
       const piGenBuildDir = path.join(config.piGenDir, 'build');
       await this.cleanDirectory(piGenBuildDir, 'pi-gen build directory');
+      
+      // Clean pi-gen export-image directory
+      const exportImageDir = path.join(config.piGenDir, 'export-image');
+      await this.cleanDirectory(exportImageDir, 'pi-gen export-image directory');
+      
+      // Clean pi-gen log files
+      const logFiles = [
+        path.join(config.piGenDir, '*.log'),
+        path.join(config.piGenDir, 'pi-gen', '*.log'),
+        path.join(config.piGenDir, 'pi-gen', 'work', '*.log')
+      ];
+      
+      for (const logPattern of logFiles) {
+        try {
+          const { glob } = require('glob');
+          const files = await glob(logPattern);
+          for (const file of files) {
+            await fs.remove(file);
+            this.cleanedItems.push(`pi-gen log: ${file}`);
+          }
+        } catch (error) {
+          // Pattern not found or glob error
+        }
+      }
     }
   }
 

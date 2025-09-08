@@ -13,6 +13,8 @@
     "clean": "node clean.js",
     "clean:artifacts": "node clean.js --artifacts --force",
     "clean:all": "node clean.js --all --force",
+    "clean:full": "node clean.js --all --docker --pi-gen --logs --force",
+    "clean:pi-gen": "node clean.js --pi-gen --docker --force",
     "lint": "echo 'Linting not implemented yet' && exit 0",
     "docker:build": "node docker-build.js",
     "docker:pi-gen": "node docker-build.js --pi-gen",
@@ -31,8 +33,8 @@
   "author": "Mark Sproul <msproul@skychariot.com>",
   "license": "Custom",
   "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "devDependencies": {
     "archiver": "^5.3.1",
@@ -51,10 +53,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/AlpacaPi.git"
+    "url": "https://github.com/open-astro/AlpacaPi.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/AlpacaPi/issues"
+    "url": "https://github.com/open-astro/AlpacaPi/issues"
   },
   "homepage": "https://msproul.github.io/AlpacaPi/"
 }

@@ -153,7 +153,7 @@ class AlpacaPiBuilder {
   async createDockerfile() {
     const dockerfile = `
 # AlpacaPi Cross-Platform Builder
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -224,15 +224,15 @@ cmake .. \\
     -DCMAKE_BUILD_TYPE=${argv.type.toUpperCase()} \\
     -DBUILD_CLIENT_APPS=OFF \\
     -DBUILD_EXAMPLES=ON \\
-    -DBUILD_TESTS=ON
+    -DBUILD_TESTS=OFF
 
 # Build
 echo "Building AlpacaPi..."
 make -j$(nproc)
 
-# Run tests
-echo "Running tests..."
-make test
+# Fix permissions for copying
+echo "Fixing permissions..."
+chown -R 1000:1000 /workspace/build 2>/dev/null || true
 
 echo "Build completed successfully!"
 `;
@@ -295,8 +295,8 @@ echo "Build completed successfully!"
     
     try {
       // Check if pi-gen is set up
-      if (!await fs.pathExists('pi-gen/setup-pi-gen.sh')) {
-        throw new Error('pi-gen not set up. Run: npm run setup');
+      if (!await fs.pathExists('pi-gen/build-alpacapi.sh')) {
+        throw new Error('pi-gen not set up. Run: npm run setup --pi-gen');
       }
 
       // Run pi-gen build

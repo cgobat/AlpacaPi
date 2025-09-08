@@ -18,8 +18,8 @@ const { hideBin } = require('yargs/helpers');
 // Configuration
 const config = {
   projectName: 'AlpacaPi',
-  nodeVersion: '14.0.0',
-  npmVersion: '6.0.0'
+  nodeVersion: '18.0.0',
+  npmVersion: '8.0.0'
 };
 
 // Parse command line arguments
@@ -120,8 +120,8 @@ class AlpacaPiSetup {
     try {
       const nodeVersion = process.version;
       const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
-      if (majorVersion < 14) {
-        throw new Error(`Node.js 14+ required, found ${nodeVersion}`);
+      if (majorVersion < 18) {
+        throw new Error(`Node.js 18+ required, found ${nodeVersion}`);
       }
       this.log(`Node.js version: ${nodeVersion}`, 'success');
     } catch (error) {

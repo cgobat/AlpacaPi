@@ -1,374 +1,762 @@
 # AlpacaPi
 
-**Professional astronomy control software using the Alpaca protocol on Raspberry Pi**
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+**Professional astronomy control software using the Alpaca protocol on Raspberry Pi 4 and Raspberry Pi 5**
 
 [![License](https://img.shields.io/badge/License-Custom-blue.svg)](LICENSE.md)
 [![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-red.svg)](https://www.raspberrypi.org/)
 [![Protocol](https://img.shields.io/badge/Protocol-Alpaca%20%2F%20ASCOM-green.svg)](https://ascom-standards.org/)
+[![Build System](https://img.shields.io/badge/Build%20System-Node.js%20%2B%20Ubuntu%2024.04-orange.svg)](https://nodejs.org/)
 
 ---
 
-## <i class="bi bi-bullseye"></i> **What is AlpacaPi?**
+## 🎯 **What is AlpacaPi?**
 
-AlpacaPi is a comprehensive astronomy control system that transforms your Raspberry Pi into a powerful observatory controller. It provides ASCOM Alpaca protocol compatibility, allowing seamless integration with popular astronomy software like **NINA**, **SharpCap**, **PHD2**, and **SGP**.
+AlpacaPi is a comprehensive astronomy control system that transforms your Raspberry Pi 4 or Raspberry Pi 5 into a powerful observatory controller. It provides ASCOM Alpaca protocol compatibility, allowing seamless integration with popular astronomy software like **NINA**, **SharpCap**, **PHD2**, and **SGP**.
 
-### <i class="bi bi-star"></i> **Key Features**
+### ⭐ **Key Features**
 
-- **<i class="bi bi-globe"></i> Alpaca Protocol**: Full ASCOM Alpaca compatibility for modern astronomy software
-- **<i class="bi bi-camera"></i> Camera Support**: ZWO, ATIK, QHY, QSI, Touptek, FLIR, Sony, and more
-- **<i class="bi bi-binoculars"></i> Telescope Control**: LX200, SkyWatcher, and custom mount protocols
-- **<i class="bi bi-gear"></i> Accessory Control**: Focusers, filter wheels, domes, switches, and rotators
-- **<i class="bi bi-rocket"></i> Ready-to-Deploy**: Custom Raspberry Pi OS images with pre-installed AlpacaPi
-- **<i class="bi bi-puzzle"></i> Modular Design**: Install only the drivers you need
-- **<i class="bi bi-phone"></i> Remote Control**: Web-based interface and API access
+- **🌐 Alpaca Protocol**: Full ASCOM Alpaca compatibility for modern astronomy software
+- **📷 Camera Support**: ZWO, ATIK, QHY, QSI, Touptek, FLIR, Sony, and more
+- **🔭 Telescope Control**: LX200, SkyWatcher, and custom mount protocols
+- **⚙️ Accessory Control**: Focusers, filter wheels, domes, switches, and rotators
+- **🚀 Ready-to-Deploy**: Custom Raspberry Pi OS images with pre-installed AlpacaPi for RPi 4 and RPi 5
+- **🧩 Modular Design**: Install only the drivers you need
+- **📱 Remote Control**: Web-based interface and API access
 
 ---
 
-## <i class="bi bi-rocket"></i> **Quick Start**
+## 🚀 **Quick Start**
 
-### **Option 1: Node.js Build System (Recommended)**
+### **Prerequisites: Ubuntu 24.04 LTS (Tested)**
+
+AlpacaPi is designed to build custom Raspberry Pi OS images for Raspberry Pi 4 and Raspberry Pi 5 using Ubuntu 24.04 LTS as the development platform. We have tested and verified compatibility with this setup.
+
+#### **Complete Prerequisites Installation**
+
+Before building AlpacaPi, you need to install several tools. Here's a complete installation guide:
+
+**1. Update your system:**
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+**2. Install essential build tools:**
+```bash
+sudo apt install -y \
+    build-essential \
+    cmake \
+    pkg-config \
+    git \
+    curl \
+    wget \
+    unzip \
+    software-properties-common \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release
+```
+
+**3. Install Git (if not already installed):**
+```bash
+sudo apt install -y git
+```
+
+**4. Install Node.js 18+ and npm:**
+```bash
+# Add NodeSource repository for Node.js 18.x
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+
+# Install Node.js and npm
+sudo apt install -y nodejs
+
+# Verify installation
+node --version  # Should show v18.x.x or higher
+npm --version   # Should show 8.x.x or higher
+```
+
+**5. Install Docker:**
+```bash
+# Add Docker's official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Add Docker repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Add your user to the docker group
+sudo usermod -aG docker $USER
+
+# Start and enable Docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Verify installation
+docker --version
+```
+
+**6. Install additional dependencies for pi-gen:**
+```bash
+sudo apt install -y \
+    quilt \
+    zerofree \
+    libcap2-bin \
+    xxd \
+    file \
+    kmod \
+    bc \
+    pigz \
+    debootstrap \
+    qemu-user-static
+```
+
+**7. Verify all installations:**
+```bash
+# Check all tools are installed
+git --version
+node --version
+npm --version
+docker --version
+cmake --version
+```
+
+**8. Log out and log back in** (or restart) to ensure Docker group permissions take effect.
+
+#### **Troubleshooting Prerequisites Installation**
+
+**Common Issues and Solutions:**
+
+**Git not found:**
+```bash
+sudo apt install -y git
+```
+
+**Node.js version too old:**
+```bash
+# Remove old version
+sudo apt remove nodejs npm
+# Install new version
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+**Docker permission denied:**
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+# Log out and log back in, or run:
+newgrp docker
+```
+
+**Docker not running:**
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+**Missing build tools:**
+```bash
+sudo apt install -y build-essential cmake pkg-config
+```
+
+**Pi-gen build fails:**
+```bash
+# Install missing dependencies
+sudo apt install -y quilt zerofree libcap2-bin xxd file kmod bc pigz
+```
+
+#### **Alternative: One-Command Installation**
+
+If you prefer to install everything at once:
+
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install all prerequisites
+sudo apt install -y \
+    build-essential cmake pkg-config git curl wget unzip \
+    software-properties-common apt-transport-https ca-certificates \
+    gnupg lsb-release quilt zerofree libcap2-bin xxd file kmod \
+    bc pigz debootstrap qemu-user-static
+
+# Install Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
+sudo apt install -y nodejs
+
+# Install Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg && \
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+sudo apt update && \
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && \
+sudo usermod -aG docker $USER && \
+sudo systemctl start docker && \
+sudo systemctl enable docker
+
+# Verify installations
+echo "Git: $(git --version)"
+echo "Node.js: $(node --version)"
+echo "npm: $(npm --version)"
+echo "Docker: $(docker --version)"
+echo "CMake: $(cmake --version)"
+```
+
+#### **Installing Node.js on Ubuntu 24.04 LTS (Alternative Methods)**
+
+1. **Using NodeSource Repository (Recommended)**:
+   ```bash
+   # Update package index
+   sudo apt update
+   
+   # Install curl if not already installed
+   sudo apt install -y curl
+   
+   # Add NodeSource repository for Node.js 18.x
+   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+   
+   # Install Node.js
+   sudo apt install -y nodejs
+   ```
+
+2. **Using Snap (Alternative)**:
+   ```bash
+   sudo snap install node --classic
+   ```
+
+3. **Using Node Version Manager (nvm)**:
+   ```bash
+   # Install nvm
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+   
+   # Restart terminal or source profile
+   source ~/.bashrc
+   
+   # Install latest LTS Node.js
+   nvm install --lts
+   nvm use --lts
+   ```
+
+#### **Installing Docker on Ubuntu 24.04 LTS**
+
+```bash
+# Update package index
+sudo apt update
+
+# Install required packages
+sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+# Add Docker's official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Add Docker repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# Add your user to the docker group
+sudo usermod -aG docker $USER
+
+# Log out and log back in for group changes to take effect
+```
+
+#### **Raspberry Pi 4 and Raspberry Pi 5 (Target Hardware Only)**
+
+**Important**: Node.js is NOT needed on the Raspberry Pi itself. The build system runs on your Ubuntu development machine and creates custom Raspberry Pi OS images that can be flashed to SD cards.
+
+#### **Verify Installation**
+
+```bash
+# Check Node.js version (should be 18+)
+node --version
+
+# Check npm version (should be 8+)
+npm --version
+
+# Check Docker installation
+docker --version
+
+# Verify Docker is running
+docker info
+```
+
+### **Installation**
+
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/AlpacaPi.git
+git clone https://github.com/open-astro/AlpacaPi.git
 cd AlpacaPi
 
-# Install dependencies and setup
+# Install dependencies
 npm install
+
+# Setup development environment
 npm run setup
 
 # Build AlpacaPi
 npm run build
-
-# Build custom Raspberry Pi OS image
-npm run build:pi-gen
-```
-
-### **Option 2: Pre-built Image**
-```bash
-# Download and flash custom AlpacaPi image
-# See pi-gen/ directory for build instructions
-```
-
-### **Option 3: Traditional Build**
-```bash
-# Clone the repository
-git clone https://github.com/your-username/AlpacaPi.git
-cd AlpacaPi
-
-# Setup and build
-./scripts/setup.sh
-sudo ./scripts/install_rules.sh
-mkdir build && cd build
-cmake .. && make -j4
 ```
 
 ---
 
-## <i class="bi bi-list-check"></i> **Supported Devices**
+## 📋 **Available Scripts**
 
-### **<i class="bi bi-camera"></i> Cameras**
-- **ZWO ASI** - All ASI cameras and accessories
-- **ATIK** - Cameras and filter wheels
-- **QHY** - CCD and CMOS cameras
-- **QSI** - Professional CCD cameras
-- **Touptek** - Budget-friendly cameras
-- **FLIR** - Industrial and scientific cameras
-- **Sony** - Mirrorless cameras (A7R IV, etc.)
-
-### **<i class="bi bi-binoculars"></i> Telescope Mounts**
-- **LX200** - Meade LX200 protocol
-- **SkyWatcher** - SynScan protocol
-- **Custom Mounts** - RoboClaw servo controllers
-
-### **<i class="bi bi-gear"></i> Accessories**
-- **Focusers**: Moonlite, ZWO EAF, custom servo
-- **Filter Wheels**: ZWO EFW, ATIK, QSI
-- **Domes**: Custom dome controllers
-- **Switches**: Power and device control
-- **Rotators**: Camera rotators and derotators
-
----
-
-## <i class="bi bi-diagram-3"></i> **Project Structure**
-
-```
-AlpacaPi/
-├── src/                    # Core source code
-│   ├── core/              # Main AlpacaPi server
-│   ├── net/               # Network protocols
-│   ├── proto/             # Protocol implementations
-│   └── util/              # Utilities and helpers
-├── drivers/               # Device drivers (organized by manufacturer)
-│   ├── zwo/               # ZWO ASI, EFW, EAF
-│   ├── atik/              # ATIK cameras and accessories
-│   ├── qhy/               # QHY cameras
-│   ├── qsi/               # QSI cameras
-│   ├── touptek/           # Touptek cameras
-│   ├── flir/              # FLIR cameras
-│   ├── sony/              # Sony cameras
-│   ├── moonlite/          # Moonlite focusers and rotators
-│   └── telescope_mounts/  # Telescope mount systems
-├── pi-gen/                # Custom Raspberry Pi OS images
-├── examples/              # Example applications
-├── scripts/               # Traditional build and installation scripts
-├── docs/                  # Documentation
-├── package.json           # Node.js project configuration
-├── build.js               # Main Node.js build script
-├── docker-build.js        # Docker build script
-├── setup.js               # Development setup script
-├── test.js                # Test runner
-├── clean.js               # Cleanup script
-└── README_NODEJS.md       # Node.js build system documentation
-```
-
----
-
-## <i class="bi bi-tools"></i> **Build Systems**
-
-### **Node.js Build System (Cross-Platform)**
-AlpacaPi includes a modern Node.js build system that works on Windows, Linux, and Mac:
-
+### **Build Scripts**
 ```bash
-# Basic builds
 npm run build                    # Default build
 npm run build:debug             # Debug build
 npm run build:release           # Release build
-npm run build:pi                # Raspberry Pi build
+npm run build:pi                # Raspberry Pi build (cross-compile)
+npm run build:pi-gen            # Create custom Raspberry Pi OS image
+```
 
-# Development
+### **Development Scripts**
+```bash
 npm run setup                   # Setup development environment
 npm run test                    # Run tests
-npm run clean                   # Clean build artifacts
+npm run clean                   # Basic cleanup (with confirmation)
+npm run clean:artifacts         # Clean build artifacts only
+npm run clean:all               # Clean everything except Docker
+npm run clean:pi-gen            # Clean pi-gen and Docker (recommended for pi-gen builds)
+npm run clean:full              # Complete cleanup (everything)
+```
 
-# Docker builds
+### **Docker Scripts**
+```bash
 npm run docker:build            # Docker build
-npm run docker:pi-gen           # Build RPi OS image
+npm run docker:pi-gen           # Build RPi OS image with Docker
 ```
-
-### **Custom Raspberry Pi OS Images**
-Create ready-to-deploy images with AlpacaPi pre-installed:
-
-```bash
-# Using Node.js (recommended)
-npm run build:pi-gen
-
-# Using traditional method
-cd pi-gen
-./setup-pi-gen.sh
-./build-alpacapi.sh
-```
-
-### **Image Variants**
-- **AlpacaPi Lite**: Minimal server-only image
-- **AlpacaPi Standard**: Common astronomy drivers
-- **AlpacaPi Full**: All available drivers
 
 ---
 
-## <i class="bi bi-gear"></i> **Node.js Build System Features**
+## ⚙️ **Build Options**
 
-### **Cross-Platform Support**
-- **Windows**: Full support with Docker and native builds
-- **Linux**: Native and Docker builds
-- **Mac**: Native and Docker builds
-- **Raspberry Pi**: Specialized pi-gen integration
+### **Target Platforms**
+- **Linux (x86_64)**: Native Ubuntu 24.04 LTS builds
+- **Raspberry Pi 4**: ARM cross-compilation and custom OS images
+- **Raspberry Pi 5**: ARM cross-compilation and custom OS images
 
-### **Build Options**
-```bash
-# Platform-specific builds
-npm run build -- --target windows
-npm run build -- --target macos
-npm run build -- --target linux
-npm run build -- --target pi
+### **Build Types**
+- **Debug**: Development builds with debugging symbols
+- **Release**: Optimized production builds
+- **Minimal**: Server-only builds (no GUI components)
+- **Full**: Complete builds with all drivers
 
-# Build types
-npm run build -- --type debug
-npm run build -- --type release
+### **Docker Options**
+- **Cross-platform builds**: Consistent builds across different systems
+- **Pi-gen integration**: Custom Raspberry Pi OS image creation
+- **Dependency management**: Isolated build environments
 
-# Docker builds
-npm run build -- --docker
-npm run docker:build
-
-# Pi-gen builds
-npm run build:pi-gen -- --image-type lite
-npm run build:pi-gen -- --image-type standard
-npm run build:pi-gen -- --image-type full
-```
-
-### **Development Tools**
-- **Setup**: One-command development environment setup
-- **Testing**: Comprehensive test runner with coverage support
-- **Cleaning**: Smart cleanup of build artifacts
-- **VS Code**: Pre-configured launch and task configurations
-- **Git Hooks**: Pre-commit validation
+### **Pi-Gen Options**
+- **Custom OS images**: Pre-configured Raspberry Pi OS with AlpacaPi
+- **Driver selection**: Choose which drivers to include
+- **Auto-start**: Configure AlpacaPi to start automatically
+- **User management**: Pre-configured system users and permissions
 
 ---
 
-## <i class="bi bi-book"></i> **Documentation**
+## 💻 **Development Workflow**
 
-- **[Main Documentation](https://msproul.github.io/AlpacaPi/)** - Complete user guide
-- **[Node.js Build System](README_NODEJS.md)** - Cross-platform build documentation
-- **[Driver Documentation](docs/drivers.html)** - Device-specific information
-- **[API Reference](docs/alpacapi.pdf)** - Technical documentation
-- **[Client Applications](docs/clientapps.html)** - GUI applications
+### **Complete Workflow: Ubuntu → Raspberry Pi 4/5**
 
----
+This workflow shows how to develop on Ubuntu 24.04 LTS and deploy to Raspberry Pi 4 or Raspberry Pi 5.
 
-## <i class="bi bi-code-slash"></i> **Development**
+### **1. Initial Setup (on your Ubuntu development machine)**
 
-### **Prerequisites**
-- **Node.js** 14.0.0+ (for Node.js build system)
-- **CMake** 3.10+ (for native builds)
-- **C++17** compatible compiler
-- **OpenCV** 3.3.1+ or 4.5.1+ (for camera drivers)
-- **cfitsio** (for FITS file support)
-- **wiringPi** (Raspberry Pi only)
-- **Docker** (optional, for containerized builds)
-
-### **Node.js Build System (Recommended)**
 ```bash
-# Setup development environment
+# Clone and setup
+git clone https://github.com/open-astro/AlpacaPi.git
+cd AlpacaPi
 npm install
 npm run setup
 
-# Build and test
-npm run build
+# Verify everything is working
 npm run test
+```
 
-# Clean and rebuild
-npm run clean
+### **2. Development**
+
+```bash
+# Make changes to source code
+# Test locally
 npm run build:debug
-```
-
-### **Traditional Build System**
-```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j4
-```
-
-### **Testing**
-```bash
-# Using Node.js build system
 npm run test
 
-# Using traditional method
-make test
-./test_camera_driver
-./test_focuser_driver
+# Clean up when needed
+npm run clean:artifacts
+```
+
+### **3. Testing**
+
+```bash
+# Run all tests
+npm run test
+
+# Build for Raspberry Pi (cross-compile)
+npm run build:pi
+
+# Test specific components
+npm run test -- --grep "camera"
+```
+
+### **4. Building for Production**
+
+```bash
+# Create custom Raspberry Pi OS image
+npm run build:pi-gen
+
+# This creates a flashable .img file in pi-gen/export-image/work/export-image/
+```
+
+### **5. Deploying to Raspberry Pi 4 or Raspberry Pi 5**
+
+1. **Flash the image**:
+   - Use Raspberry Pi Imager to flash the generated `.img` file to an SD card
+   - Insert SD card into your Raspberry Pi 4 or Raspberry Pi 5
+
+2. **Boot and configure**:
+   - Power on the Raspberry Pi
+   - AlpacaPi will start automatically
+   - Access via web interface at `http://raspberry-pi-ip:8000`
+
+---
+
+## 🐳 **Docker Integration**
+
+### **Docker Builds**
+
+The build system uses Docker for consistent, reproducible builds:
+
+```bash
+# Build using Docker
+npm run docker:build
+
+# Build Raspberry Pi OS image using Docker
+npm run docker:pi-gen
+```
+
+### **Docker Images**
+
+- **AlpacaPi Builder**: Cross-platform build environment
+- **Raspberry Pi OS image builder for RPi 4 and RPi 5**: Custom pi-gen integration
+
+---
+
+## 💾 **Raspberry Pi Deployment**
+
+### **Complete Deployment Workflow**
+
+1. **Development** (Ubuntu 24.04 LTS):
+   ```bash
+   npm run build:pi-gen
+   ```
+
+2. **Image Creation**:
+   - Creates custom Raspberry Pi OS image with AlpacaPi pre-installed
+   - Includes all dependencies and drivers
+   - Configures system to start AlpacaPi automatically
+
+3. **Deployment**:
+   - Flash image to SD card using Raspberry Pi Imager
+   - Insert SD card into Raspberry Pi 4 or Raspberry Pi 5
+   - Power on and connect to network
+
+4. **Access**:
+   - Web interface: `http://raspberry-pi-ip:8000`
+   - AlpacaPi API: `http://raspberry-pi-ip:8000/api/v1/`
+
+### **Image Variants**
+
+- **AlpacaPi Lite**: Minimal server-only image (~500MB)
+- **AlpacaPi Standard**: Common astronomy drivers (~800MB)
+- **AlpacaPi Full**: All available drivers (~1.2GB)
+
+---
+
+## 📋 **Supported Devices**
+
+### **📷 Cameras**
+- **ZWO**: ASI series (ASI120, ASI1600, ASI2600, etc.)
+- **ATIK**: 314L+, 383L+, 460EX, etc.
+- **QHY**: QHY5L-II, QHY8L, QHY163M, etc.
+- **QSI**: 600 series, 700 series
+- **Touptek**: ATR3CMOS, IMX178, etc.
+- **FLIR**: Chameleon3, Blackfly S
+- **Sony**: IMX-based cameras
+- **Player One**: Apollo series
+
+### **🔭 Telescope Mounts**
+- **LX200**: Meade LX200, LX400 series
+- **SkyWatcher**: EQ6, AZ-EQ6, HEQ5, etc.
+- **Custom**: Support for custom mount protocols
+
+### **⚙️ Accessories**
+- **Focusers**: MoonLite, ZWO EAF, Optec, etc.
+- **Filter Wheels**: ZWO EFW, ATIK EFW2, etc.
+- **Rotators**: ZWO EAF, Optec Pyxis, etc.
+- **Domes**: AstroHaven, Pulsar, etc.
+- **Switches**: Generic relay control
+
+---
+
+## 🧩 **Project Structure**
+
+```
+AlpacaPi/
+├── src/                    # Source code
+│   ├── core/              # Core AlpacaPi functionality
+│   ├── drivers/           # Device drivers
+│   └── util/              # Utility functions
+├── include/               # Header files
+├── examples/              # Example applications
+├── docs/                  # Documentation
+├── pi-gen/                # Custom Raspberry Pi OS image builder
+├── scripts/               # Build and utility scripts
+├── package.json           # Node.js configuration
+├── build.js               # Main build script
+├── clean.js               # Cleanup script
+└── setup.js               # Setup script
 ```
 
 ---
 
-## <i class="bi bi-graph-up"></i> **ASCOM Conformance**
+## 🔧 **Advanced Usage**
 
-AlpacaPi drivers have passed ASCOM CONFORM testing:
+### **Custom Build Configuration**
 
-| Driver Type | Status | Date |
-|-------------|--------|------|
-| Camera (ZWO) | ✅ PASSED | Jan 2021 |
-| Filter Wheel | ✅ PASSED | Apr 2020 |
-| Focuser | ✅ PASSED | Apr 2020 |
-| Rotator | ✅ PASSED | Apr 2020 |
-| Switch | ✅ PASSED | Apr 2020 |
-| Dome/ROR | ✅ PASSED | Jan 2021 |
-| Observing Conditions | ✅ PASSED | Mar 2021 |
-| Cover Calibrator | ✅ PASSED | Apr 2021 |
+```bash
+# Build with specific drivers
+npm run build:pi-gen -- --drivers="zwo,atik,qhy"
+
+# Build minimal image
+npm run build:pi-gen -- --minimal
+
+# Build with custom configuration
+npm run build:pi-gen -- --config=my-config.json
+```
+
+### **Platform Building**
+
+```bash
+# Cross-compile for Raspberry Pi
+npm run build:pi
+
+# Build for specific architecture
+npm run build:pi -- --arch=arm64
+```
+
+### **Pi-Gen Customization**
+
+```bash
+# Custom pi-gen configuration
+cd pi-gen
+cp config_alpacapi config
+# Edit config file
+./build-alpacapi.sh
+```
 
 ---
 
-## <i class="bi bi-people"></i> **Contributing**
+## 🛡️ **Prerequisites**
+
+### **Required**
+- **Ubuntu 24.04 LTS** (tested and verified development platform)
+- **Node.js 18+** and **npm 8+**
+- **Docker** (for pi-gen builds)
+- **Git** (for cloning repository)
+
+### **Optional**
+- **Raspberry Pi 4 or Raspberry Pi 5** (target hardware)
+- **SD card** (for flashing custom images)
+- **Raspberry Pi Imager** (for flashing images)
+
+---
+
+## ❓ **Troubleshooting**
+
+### **Common Issues**
+
+#### **Node.js Installation Issues**
+```bash
+# Check Node.js version
+node --version
+
+# If version is too old, reinstall
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+#### **Permission Issues (Ubuntu)**
+```bash
+# Fix npm permissions
+sudo chown -R $(whoami) ~/.npm
+
+# Fix Docker permissions
+sudo usermod -aG docker $USER
+# Log out and log back in
+```
+
+#### **Docker Not Running**
+```bash
+# Start Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Check Docker status
+sudo systemctl status docker
+```
+
+#### **Build Failures**
+```bash
+# Clean everything and try again
+npm run clean:full
+npm install
+npm run build
+
+# Check for specific errors
+npm run build -- --verbose
+```
+
+#### **Test Failures**
+```bash
+# Run tests with verbose output
+npm run test -- --verbose
+
+# Run specific tests
+npm run test -- --grep "camera"
+```
+
+### **Getting Help**
+
+- **GitHub Issues**: [Report bugs and request features](https://github.com/open-astro/AlpacaPi/issues)
+- **Documentation**: Check the `docs/` directory for detailed guides
+- **Community**: Join our community discussions
+
+---
+
+## 📈 **ASCOM Conformance**
+
+AlpacaPi implements the ASCOM Alpaca protocol specification, providing compatibility with:
+
+- **NINA**: Nighttime Imaging 'N' Astronomy
+- **SharpCap**: Planetary imaging and EAA
+- **PHD2**: Guiding software
+- **SGP**: Sequence Generator Pro
+- **MaxIm DL**: Professional imaging software
+- **TheSkyX**: Professional planetarium software
+
+### **Supported ASCOM Device Types**
+- **Telescope**: Mount control and pointing
+- **Camera**: Image acquisition and control
+- **FilterWheel**: Filter selection
+- **Focuser**: Focus control
+- **Rotator**: Camera rotation
+- **Dome**: Observatory dome control
+- **Switch**: Generic relay control
+
+---
+
+## 👥 **Contributing**
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ### **Development Priorities**
-1. <i class="bi bi-check-circle-fill text-success"></i> **Phase 1**: Modern C++ structure and organization
-2. <i class="bi bi-check-circle-fill text-success"></i> **Phase 2**: Node.js build system and pi-gen integration
-3. <i class="bi bi-arrow-clockwise text-warning"></i> **Phase 3**: Script architecture and modular installation
-4. <i class="bi bi-list-check text-secondary"></i> **Phase 4**: Code modernization (C++17 features, RAII, smart pointers)
-5. <i class="bi bi-list-check text-secondary"></i> **Phase 5**: Performance optimization and advanced features
+1. **Driver Development**: New camera and accessory drivers
+2. **Protocol Support**: Additional ASCOM device types
+3. **Testing**: Automated testing and validation
+4. **Documentation**: User guides and API documentation
+5. **Performance**: Optimization and reliability improvements
 
 ---
 
-## <i class="bi bi-file-text"></i> **License**
+## 📄 **License**
 
-**Copyright (C) 2019-2024 by Mark Sproul**  
-**Email**: msproul@skychariot.com
+This project is licensed under a custom license. See [LICENSE.md](LICENSE.md) for details.
 
 ### **Usage Terms**
-- ✅ **Private/Individual Use**: Granted
-- ⚠️ **Commercial Use**: Requires written agreement
-- 📝 **Modifications**: Allowed with attribution
-- 🔄 **Redistribution**: Must retain copyright notice
-
-**No warranty, obligations, or liability** - Use at your own risk.
+- **Commercial Use**: Allowed with attribution
+- **Modification**: Allowed
+- **Distribution**: Allowed
+- **Private Use**: Allowed
 
 ---
 
-## <i class="bi bi-heart"></i> **Acknowledgments**
+## ❤️ **Acknowledgments**
 
-- **Mark Sproul** - Original author and maintainer
-- **ASCOM Standards** - Protocol specifications
-- **Vendor SDKs** - Device driver libraries
-- **Community** - Testing and feedback
-
----
-
-## <i class="bi bi-headset"></i> **Support**
-
-- **Documentation**: [https://msproul.github.io/AlpacaPi/](https://msproul.github.io/AlpacaPi/)
-- **Issues**: [GitHub Issues](https://github.com/your-username/AlpacaPi/issues)
-- **Email**: msproul@skychariot.com
+- **ASCOM Standards**: For the Alpaca protocol specification
+- **Raspberry Pi Foundation**: For the amazing hardware platform
+- **Open Source Community**: For the tools and libraries that make this possible
+- **Astronomy Community**: For feedback and testing
 
 ---
 
-## <i class="bi bi-gift"></i> **Donations**
+## 🎧 **Support**
 
-If you find AlpacaPi useful, consider supporting the project:
-
-- **PayPal**: msproul@skychariot.com
-- **GitHub Sponsors**: [Sponsor Mark](https://github.com/sponsors/msproul)
+- **Documentation**: Check the `docs/` directory
+- **GitHub Issues**: [Report bugs and request features](https://github.com/open-astro/AlpacaPi/issues)
+- **Community**: Join our community discussions
+- **Email**: Contact the maintainers
 
 ---
 
-## <i class="bi bi-lightning"></i> **Quick Reference**
+## 🎁 **Donations**
+
+If you find AlpacaPi useful, please consider supporting the project:
+
+- **GitHub Sponsors**: Support ongoing development
+- **PayPal**: One-time donations
+- **Hardware**: Donate Raspberry Pi hardware for testing
+
+---
+
+## ⚡ **Quick Reference**
 
 ### **Most Common Commands**
+
 ```bash
-# Get started
-npm install && npm run setup
+# Setup
+npm install
+npm run setup
 
-# Build and test
-npm run build && npm run test
+# Development
+npm run build:debug
+npm run test
 
-# Build for Raspberry Pi
-npm run build:pi
-
-# Create custom RPi OS image
+# Production
 npm run build:pi-gen
 
-# Clean everything
-npm run clean -- --all
+# Cleanup
+npm run clean:pi-gen
 ```
 
 ### **Advanced Commands**
-```bash
-# Debug build with verbose output
-npm run build:debug -- --verbose
 
-# Build for specific platform
-npm run build -- --target windows --type release
+```bash
+# Custom builds
+npm run build:pi-gen -- --drivers="zwo,atik"
+npm run build:pi-gen -- --minimal
 
 # Docker builds
-npm run docker:build
-npm run docker:pi-gen -- --image-type full
+npm run docker:pi-gen
 
-# Test with coverage
-npm run test -- --coverage
+# Complete cleanup
+npm run clean:full
 ```
+
+### **Cleanup Commands Reference**
+
+| Command | Build Artifacts | Docker | Pi-gen | Logs | Temp Files | Node Modules |
+|---------|----------------|--------|--------|------|------------|--------------|
+| `clean` | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| `clean:artifacts` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `clean:all` | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| `clean:pi-gen` | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| `clean:full` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
-*AlpacaPi - Bringing professional astronomy control to the Raspberry Pi* <i class="bi bi-rocket"></i>
+**Happy Observing! 🌟**

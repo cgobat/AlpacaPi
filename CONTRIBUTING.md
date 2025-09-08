@@ -2,28 +2,28 @@
 
 Thank you for your interest in contributing to AlpacaPi! This document provides guidelines and information for contributors.
 
-## <i class="bi bi-heart"></i> **How to Contribute**
+## ❤️ **How to Contribute**
 
 We welcome contributions from the community! Here are the main ways you can help:
 
-### **<i class="bi bi-bug"></i> Bug Reports**
-- Use the [GitHub Issues](https://github.com/your-username/AlpacaPi/issues) page
+### **🐛 Bug Reports**
+- Use the [GitHub Issues](https://github.com/open-astro/AlpacaPi/issues) page
 - Include detailed reproduction steps
 - Provide system information (OS, hardware, driver versions)
 - Attach relevant log files
 
-### **<i class="bi bi-lightbulb"></i> Feature Requests**
+### **💡 Feature Requests**
 - Open an issue with the "enhancement" label
 - Describe the use case and expected behavior
 - Consider if it aligns with the project goals
 
-### **<i class="bi bi-code"></i> Code Contributions**
+### **💻 Code Contributions**
 - Fork the repository
 - Create a feature branch
 - Make your changes
 - Submit a pull request
 
-## <i class="bi bi-list-check"></i> **Development Guidelines**
+## 📋 **Development Guidelines**
 
 ### **Code Style**
 - Follow the existing C++ coding standards
@@ -46,7 +46,7 @@ refactor: Reorganize driver directory structure
 - Add tests for new features
 - Update documentation as needed
 
-## <i class="bi bi-diagram-3"></i> **Project Structure**
+## 🏗️ **Project Structure**
 
 Understanding the project structure helps with contributions:
 
@@ -61,21 +61,49 @@ AlpacaPi/
 ├── pi-gen/                # Custom Raspberry Pi OS images
 ├── examples/              # Example applications
 ├── scripts/               # Build and installation scripts
-└── docs/                  # Documentation
+├── docs/                  # Documentation
+├── package.json           # Node.js build system configuration
+├── build.js               # Main build script
+├── clean.js               # Cleanup script
+└── setup.js               # Setup script
 ```
 
-## <i class="bi bi-gear"></i> **Development Setup**
+## ⚙️ **Development Setup**
 
-### **Prerequisites**
-- CMake 3.10+
-- C++17 compatible compiler
-- Git
-- (Optional) Docker for pi-gen builds
+### **Prerequisites: Ubuntu 24.04 LTS (Recommended)**
+- **Ubuntu 24.04 LTS** (tested and verified development platform)
+- **Node.js 18+** and **npm 8+**
+- **Docker** (for pi-gen builds)
+- **Git**
+- **CMake 3.10+**
+- **C++17 compatible compiler**
 
-### **Build Instructions**
+### **Node.js Build System (Recommended)**
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/AlpacaPi.git
+git clone https://github.com/open-astro/AlpacaPi.git
+cd AlpacaPi
+
+# Install dependencies
+npm install
+
+# Setup development environment
+npm run setup
+
+# Build AlpacaPi
+npm run build
+
+# Run tests
+npm run test
+
+# Clean up when needed
+npm run clean:artifacts
+```
+
+### **Traditional CMake Build (Alternative)**
+```bash
+# Clone the repository
+git clone https://github.com/open-astro/AlpacaPi.git
 cd AlpacaPi
 
 # Create build directory
@@ -89,7 +117,16 @@ make -j4
 make test
 ```
 
-## <i class="bi bi-puzzle"></i> **Driver Development**
+### **Docker Development Environment**
+```bash
+# Build using Docker
+npm run docker:build
+
+# Build Raspberry Pi OS image
+npm run docker:pi-gen
+```
+
+## 🧩 **Driver Development**
 
 ### **Adding New Drivers**
 1. Create driver directory in `drivers/[manufacturer]/`
@@ -113,7 +150,19 @@ public:
 };
 ```
 
-## <i class="bi bi-file-text"></i> **Documentation**
+### **Driver Testing**
+```bash
+# Test specific driver
+npm run test -- --grep "camera"
+
+# Build for Raspberry Pi testing
+npm run build:pi
+
+# Create test image
+npm run build:pi-gen
+```
+
+## 📄 **Documentation**
 
 ### **Code Documentation**
 - Use Doxygen-style comments for public APIs
@@ -124,8 +173,9 @@ public:
 - Update README.md for major changes
 - Add driver-specific documentation
 - Update installation instructions
+- Keep cleanup commands chart updated
 
-## <i class="bi bi-shield-check"></i> **Quality Standards**
+## 🛡️ **Quality Standards**
 
 ### **Code Quality**
 - No memory leaks
@@ -139,13 +189,20 @@ public:
 - Manual testing on target hardware
 - Performance testing for critical paths
 
-## <i class="bi bi-git"></i> **Pull Request Process**
+### **Build System Requirements**
+- All builds must pass on Ubuntu 24.04 LTS
+- Docker builds must work consistently
+- Pi-gen builds must create valid images
+- Cleanup scripts must work properly
+
+## 🔧 **Pull Request Process**
 
 ### **Before Submitting**
 1. Ensure your code compiles without warnings
 2. Run all existing tests
 3. Update documentation if needed
 4. Test on target hardware if possible
+5. Verify cleanup scripts work
 
 ### **Pull Request Template**
 ```markdown
@@ -157,21 +214,31 @@ Brief description of changes
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
+- [ ] Build system update
 
 ## Testing
 - [ ] Unit tests pass
 - [ ] Integration tests pass
 - [ ] Manual testing completed
 - [ ] Hardware testing completed (if applicable)
+- [ ] Docker builds work
+- [ ] Pi-gen builds work (if applicable)
+
+## Build System
+- [ ] Node.js builds work
+- [ ] CMake builds work
+- [ ] Cleanup scripts work
+- [ ] Documentation updated
 
 ## Checklist
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
 - [ ] No breaking changes (or documented)
+- [ ] README.md updated if needed
 ```
 
-## <i class="bi bi-people"></i> **Community Guidelines**
+## 👥 **Community Guidelines**
 
 ### **Code of Conduct**
 - Be respectful and inclusive
@@ -185,7 +252,7 @@ Brief description of changes
 - Ask questions when unsure
 - Share knowledge and experience
 
-## <i class="bi bi-question-circle"></i> **Getting Help**
+## ❓ **Getting Help**
 
 ### **Questions and Support**
 - Check existing issues and discussions
@@ -197,8 +264,9 @@ Brief description of changes
 - [Main Documentation](https://msproul.github.io/AlpacaPi/)
 - [API Reference](docs/alpacapi.pdf)
 - [Driver Documentation](docs/drivers.html)
+- [README.md](README.md) - Comprehensive project documentation
 
-## <i class="bi bi-award"></i> **Recognition**
+## 🏆 **Recognition**
 
 Contributors will be recognized in:
 - CONTRIBUTORS.md file
@@ -206,13 +274,13 @@ Contributors will be recognized in:
 - Project documentation
 - Community acknowledgments
 
-## <i class="bi bi-file-earmark-text"></i> **License**
+## 📄 **License**
 
 By contributing to AlpacaPi, you agree that your contributions will be licensed under the same terms as the project. See [LICENSE.md](LICENSE.md) for details.
 
 ---
 
-## <i class="bi bi-heart"></i> **Thank You**
+## ❤️ **Thank You**
 
 Thank you for contributing to AlpacaPi! Your efforts help make astronomy more accessible and enjoyable for everyone.
 
