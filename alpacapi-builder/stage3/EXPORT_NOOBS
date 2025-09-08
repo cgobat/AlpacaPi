@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+# AlpacaPi NOOBS export configuration
+# This file is sourced by pi-gen during NOOBS image creation
+
+# Set image name for NOOBS
+IMG_NAME="alpacapi"
+
+# Set user information
+FIRST_USER_NAME="alpacapi"
+FIRST_USER_PASS="alpacapi"
+
+# Set WiFi information
+WPA_ESSID="alpacapi"
+WPA_PASSWORD="alpacapi"
+WPA_COUNTRY="US"
+
+# Enable SSH
+ENABLE_SSH=1
+
+# Set stage list
+STAGE_LIST="stage0 stage1 stage2 stage3"

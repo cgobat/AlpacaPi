@@ -1,0 +1,9 @@
+IMG_NAME='alpacapi'
+FIRST_USER_NAME='alpacapi'
+FIRST_USER_PASS='alpacapi'
+WPA_ESSID='alpacapi'
+WPA_PASSWORD='alpacapi'
+WPA_COUNTRY='US'
+ENABLE_SSH=1
+STAGE_LIST='stage0 stage1 stage2 stage3'
+DEPLOY_COMPRESSION=zip

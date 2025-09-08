@@ -2,24 +2,13 @@
   "name": "alpacapi",
   "version": "1.0.0",
   "description": "Professional astronomy control software using the Alpaca protocol on Raspberry Pi",
-  "main": "build.js",
+  "main": "src/core/alpacapi.cpp",
   "scripts": {
-    "build": "node build.js",
-    "build:debug": "node build.js --debug",
-    "build:release": "node build.js --release",
-    "build:pi": "node build.js --target pi",
-    "build:pi-gen": "node build.js --pi-gen",
-    "test": "node test.js",
-    "clean": "node clean.js",
-    "clean:artifacts": "node clean.js --artifacts --force",
-    "clean:all": "node clean.js --all --force",
-    "clean:full": "node clean.js --all --docker --pi-gen --logs --force",
-    "clean:pi-gen": "node clean.js --pi-gen --docker --force",
-    "lint": "echo 'Linting not implemented yet' && exit 0",
-    "docker:build": "node docker-build.js",
-    "docker:pi-gen": "node docker-build.js --pi-gen",
-    "install:dev": "npm install",
-    "setup": "node setup.js"
+    "build:pi-image": "cd alpacapi-builder && ./build_alpacapi_arm64.sh",
+    "build:pi-image-armhf": "cd alpacapi-builder && ./build_alpacapi_armhf.sh",
+    "build:pi-image-arm64": "cd alpacapi-builder && ./build_alpacapi_arm64.sh",
+    "clean": "rm -rf build/ && rm -rf alpacapi-builder/pi-gen-* && rm -f alpacapi-builder/*-alpacapi-*.zip",
+    "install:dev": "npm install"
   },
   "keywords": [
     "astronomy",
@@ -36,21 +25,8 @@
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
-  "devDependencies": {
-    "archiver": "^5.3.1",
-    "chalk": "^4.1.2",
-    "commander": "^9.4.1",
-    "cross-spawn": "^7.0.3",
-    "fs-extra": "^11.1.1",
-    "glob": "^10.3.10",
-    "inquirer": "^8.2.5",
-    "ora": "^5.4.1",
-    "yargs": "^17.7.2"
-  },
-  "dependencies": {
-    "dockerode": "^4.0.7",
-    "tar": "^6.1.13"
-  },
+  "devDependencies": {},
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/open-astro/AlpacaPi.git"
