@@ -1,4 +1,13 @@
-# CURSOR.md
+---
+description: AlpacaPi project context and development guidelines
+globs: ["**/*.cpp", "**/*.h", "**/*.c", "**/CMakeLists.txt", "**/*.sh"]
+alwaysApply: true
+---
+
+# AlpacaPi Project Context
+
+## Project Overview
+AlpacaPi is a C++ implementation of the ASCOM Alpaca protocol for astronomical equipment control on Raspberry Pi. The project provides a modular, modern C++ architecture for controlling telescopes, cameras, focusers, and other astronomical devices.
 
 ## Phase 1: Restructure to Modern C++ Standards ✅ COMPLETED
 - Create proper directory structure: `cmake/`, `include/alpacapi/`, `src/{core,net,proto,util}/`, `drivers/`, `examples/`, `tests/`, `scripts/`, `docs/`
@@ -65,16 +74,53 @@
 - **Documentation**: See `SCRIPT.md` for detailed script architecture and goals
 
 ## C++ Coding Standards
-	•	Use C++17 (no compiler extensions).
-	•	Turn on warnings: -Wall -Wextra -Wpedantic and treat as errors in CI (-Werror there only).
-	•	Prefer RAII + smart pointers (std::unique_ptr by default, std::shared_ptr only when ownership is shared).
-	•	No raw new/delete; no C-style casts; use static_cast/reinterpret_cast when necessary.
-	•	Const-correctness; pass by const& for non-trivial types; move where appropriate.
-	•	Use STL types (std::string, std::vector, std::array, std::optional, std::chrono) over custom/legacy.
-	•	Functions: narrow interfaces, noexcept where it's true; avoid global mutable state.
-	•	Namespaces: alpacapi::<module>; no using namespace in headers.
-	•	Headers: include guards via #pragma once; minimize includes; prefer forward decls.
-	•	Logging/errors: return expected-style via tl::expected (if added) or error enums + status objects; do not throw for normal flow.
-	•	Threading: use <thread>, <mutex>, <future>; avoid non-portable APIs.
-	•	Formatting/lint: clang-format + clang-tidy (modernize/readability/bugprone/cppcoreguidelines).
-	•	Keep Alpaca protocol surface stable; internal refactors must not change behavior in Phase 1.
+- Use C++17 (no compiler extensions).
+- **Use tabs for indentation, not spaces** - this is critical for Mark's workflow.
+- Turn on warnings: -Wall -Wextra -Wpedantic and treat as errors in CI (-Werror there only).
+- Prefer RAII + smart pointers (std::unique_ptr by default, std::shared_ptr only when ownership is shared).
+- No raw new/delete; no C-style casts; use static_cast/reinterpret_cast when necessary.
+- Const-correctness; pass by const& for non-trivial types; move where appropriate.
+- Use STL types (std::string, std::vector, std::array, std::optional, std::chrono) over custom/legacy.
+- Functions: narrow interfaces, noexcept where it's true; avoid global mutable state.
+- Namespaces: alpacapi::<module>; no using namespace in headers.
+- Headers: include guards via #pragma once; minimize includes; prefer forward decls.
+- Logging/errors: return expected-style via tl::expected (if added) or error enums + status objects; do not throw for normal flow.
+- Threading: use <thread>, <mutex>, <future>; avoid non-portable APIs.
+- Formatting/lint: clang-format + clang-tidy (modernize/readability/bugprone/cppcoreguidelines).
+- Keep Alpaca protocol surface stable; internal refactors must not change behavior in Phase 1.
+
+## Project Structure
+```
+AlpacaPi/
+├── .cursor/                 # Cursor IDE configuration
+├── alpacapi-builder/        # Pi-gen integration for custom OS images
+├── assets/                  # Logos and static assets
+├── data/                    # Configuration and astronomical data files
+├── docs/                    # Documentation and HTML files
+├── drivers/                 # Device-specific driver implementations
+├── examples/                # Demo applications and examples
+├── include/alpacapi/        # Public API headers
+├── scripts/                 # Build and installation scripts
+└── src/                     # Core source code
+    ├── core/               # Core Alpaca protocol implementation
+    ├── net/                # Network layer
+    └── util/               # Utility functions
+```
+
+## Key Technologies
+- **Language**: C++17
+- **Build System**: CMake
+- **Protocol**: ASCOM Alpaca (REST API)
+- **Target Platform**: Raspberry Pi (ARM64/ARMHF)
+- **Integration**: NINA, pi-gen for custom OS images
+- **Drivers**: ZWO, QHY, Atik, PlayerOne, QSI, Sony, and more
+
+## AI Assistant Guidelines
+When working on this project:
+1. Always maintain the Alpaca protocol compatibility
+2. Follow the established directory structure
+3. Use modern C++17 practices
+4. Batch related changes for efficiency
+5. Focus on user testing and feedback
+6. Generate clear commit messages when requested
+7. Never push code directly - let user handle Git operations

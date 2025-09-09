@@ -124,9 +124,9 @@ list(REMOVE_ITEM ALPACAPI_SOURCES
 
 add_library(alpacapi ${ALPACAPI_SOURCES} ${ALPACAPI_PUBLIC_HEADERS})
 target_include_directories(alpacapi
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
 )
 target_compile_features(alpacapi PUBLIC cxx_std_17)
 
