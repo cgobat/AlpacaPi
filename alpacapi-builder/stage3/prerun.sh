@@ -6,7 +6,9 @@
 # Create alpacapi user if it doesn't exist
 if ! id "alpacapi" &>/dev/null; then
     useradd -m -s /bin/bash alpacapi
-    echo "alpacapi:alpacapi" | sudo chpasswd
+#    echo "alpacapi:alpacapi" | chpasswd
+# Set password directly (encrypted password for "alpacapi")
+    usermod -p '$(openssl passwd -6 alpacapi)' alpacapi
     usermod -aG sudo alpacapi
 fi
 
