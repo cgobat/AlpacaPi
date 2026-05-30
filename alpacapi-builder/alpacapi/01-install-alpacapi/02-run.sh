@@ -108,10 +108,10 @@ if [ ! -d "QHY" ]; then
 fi
 
 # Download ATIK SDK
-if [ ! -f "AtikCamerasSDK-129.zip" ]; then
+if [ ! -f "AtikCamerasSDK_2025_11_11_Master_2111.zip" ]; then
     echo "Downloading ATIK SDK..."
-    wget https://www.atik-cameras.com/downloads/AtikCamerasSDK-129.zip
-    unzip AtikCamerasSDK-129.zip
+    wget https://downloads.atik-cameras.com/AtikCamerasSDK_2025_11_11_Master_2111.zip
+    unzip AtikCamerasSDK_2025_11_11_Master_2111.zip
 fi
 
 # Download Touptek SDK

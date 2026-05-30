@@ -24,7 +24,7 @@
 //*     Have to copy the appropriate library into /usr/lib
 //*
 //*	References:
-//*		https://www.atik-cameras.com/wp-content/uploads/2019/11/AtikCamerasSDK-129.zip
+//*		https://downloads.atik-cameras.com/AtikCamerasSDK_2025_11_11_Master_2111.zip
 //*		https://ascom-standards.org/api/#/Dome%20Specific%20Methods/get_dome__device_number__athome
 //*		https://github.com/OpenPHDGuiding/phd2/tree/master/cameras/zwolibs
 //*
