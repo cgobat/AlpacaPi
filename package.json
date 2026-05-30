@@ -29,10 +29,10 @@
   "dependencies": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-astro/AlpacaPi.git"
+    "url": "https://github.com/msproul/AlpacaPi.git"
   },
   "bugs": {
-    "url": "https://github.com/open-astro/AlpacaPi/issues"
+    "url": "https://github.com/msproul/AlpacaPi/issues"
   },
   "homepage": "https://msproul.github.io/AlpacaPi/"
 }

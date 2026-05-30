@@ -7,7 +7,7 @@ Thank you for your interest in contributing to AlpacaPi! This document provides 
 We welcome contributions from the community! Here are the main ways you can help:
 
 ### **🐛 Bug Reports**
-- Use the [GitHub Issues](https://github.com/open-astro/AlpacaPi/issues) page
+- Use the [GitHub Issues](https://github.com/mconsidine/AlpacaPi/issues) page
 - Include detailed reproduction steps
 - Provide system information (OS, hardware, driver versions)
 - Attach relevant log files
@@ -81,7 +81,7 @@ AlpacaPi/
 ### **Node.js Build System (Recommended)**
 ```bash
 # Clone the repository
-git clone https://github.com/open-astro/AlpacaPi.git
+git clone https://github.com/mconsidine/AlpacaPi.git
 cd AlpacaPi
 
 # Install dependencies
@@ -103,7 +103,7 @@ npm run clean:artifacts
 ### **Traditional CMake Build (Alternative)**
 ```bash
 # Clone the repository
-git clone https://github.com/open-astro/AlpacaPi.git
+git clone https://github.com/mconsidine/AlpacaPi.git
 cd AlpacaPi
 
 # Create build directory

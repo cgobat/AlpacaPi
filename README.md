@@ -74,7 +74,7 @@ Create a custom Raspberry Pi OS image with AlpacaPi pre-installed:
 
 ```bash
 # Clone the repository
-git clone https://github.com/open-astro/AlpacaPi.git
+git clone https://github.com/mconsidine/AlpacaPi.git
 cd AlpacaPi
 
 # OPTIONAL: Optimize build environment for maximum performance
@@ -275,7 +275,7 @@ sudo systemctl enable docker
 
 2. **Clone and Setup**:
    ```bash
-   git clone https://github.com/open-astro/AlpacaPi.git
+   git clone https://github.com/mconsidine/AlpacaPi.git
    cd AlpacaPi
    ```
 
@@ -558,7 +558,7 @@ If you find AlpacaPi useful, please consider supporting the project:
 sudo apt update && sudo apt upgrade -y && sudo apt install -y build-essential cmake pkg-config git curl wget unzip software-properties-common apt-transport-https ca-certificates gnupg lsb-release quilt zerofree libcap2-bin xxd file kmod bc pigz debootstrap qemu-user-static && sudo snap install docker && sudo usermod -aG snap_docker $USER && sudo snap start docker
 
 # Clone and setup
-git clone https://github.com/open-astro/AlpacaPi.git && cd AlpacaPi
+git clone https://github.com/mconsidine/AlpacaPi.git && cd AlpacaPi
 
 # OPTIONAL: Optimize for high-core systems
 cd alpacapi-builder && ./optimize-build.sh

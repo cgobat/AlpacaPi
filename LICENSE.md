@@ -28,8 +28,7 @@
 This repository is a fork maintained by the **OpenAstro** project.  
 
 - Website: [https://www.openastro.net](https://www.openastro.net)  
-- OpenAstro GitHub Repo: [https://github.com/open-astro/AlpacaPi](https://github.com/open-astro/AlpacaPi)  
-- Forked Repo: [https://github.com/open-astro/AlpacaPi/tree/main](https://github.com/open-astro/AlpacaPi/tree/main)
+- Forked Repo: [https://github.com/mconsidine/AlpacaPi](https://github.com/mconsidine/AlpacaPi)
 
 ### Notices
 
