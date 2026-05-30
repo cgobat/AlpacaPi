@@ -74,6 +74,37 @@ jobs:
           sudo mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc || true
           docker version
 
+      - name: Patch pi-gen stage layout for this run
+        working-directory: alpacapi-builder
+        run: |
+          set -euxo pipefail
+          rm -rf stage-alpacapi
+          cp -a stage3 stage-alpacapi
+          sed -i "s/STAGE_LIST='stage0 stage1 stage2 stage3'/STAGE_LIST='stage0 stage1 stage2 stage-alpacapi'/" config
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("common.sh")
+          text = path.read_text()
+          old = "cp -Rf config stage2 stage3 ${work_dir}"
+          new = "cp -Rf config stage2 stage-alpacapi ${work_dir}"
+
+          if old not in text:
+              raise SystemExit(f"Could not find expected line in {path}: {old}")
+
+          path.write_text(text.replace(old, new))
+          PY
+
+          cat > stage-alpacapi/prerun.sh <<'EOF'
+          #!/bin/bash -e
+          copy_previous
+          EOF
+          chmod +x stage-alpacapi/prerun.sh
+
+          grep -n "STAGE_LIST\|stage-alpacapi\|cp -Rf" config common.sh
+          cat stage-alpacapi/prerun.sh
+
       - name: Build ARM64 image with alpacapi-builder
         working-directory: alpacapi-builder
         run: |
