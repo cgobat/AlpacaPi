@@ -46,7 +46,7 @@
 //*	Jan  5,	2025	<MLS> New version of QSI SDK available v2024.09.05.77
 //*****************************************************************************
 //	https://qsimaging.com/drivers-software/
-//	https://downloads.atik-cameras.com/QSI_SDK_Linux-2024.09.05.77.tar.gz
+//	https://downloads.atik-cameras.com/QSI_SDK_Linux-2025.05.30.111.tar.gz
 //*****************************************************************************
 #if defined(_ENABLE_CAMERA_) && defined(_ENABLE_QSI_)
 
