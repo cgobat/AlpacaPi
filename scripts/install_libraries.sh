@@ -129,13 +129,13 @@ FLIR_SDK_DIR="FLIR-SDK"
 
 
 ###########################################################
-function InstallToupTec()
+function InstallToupTek()
 {
 echo "***************************************************************"
 if [ -d "toupcamsdk" ]
 then
-	echo "Touptech SDK library found"
-	echo -n "Would you like to install ToupTec support [y/n]?"
+	echo "Touptek SDK library found"
+	echo -n "Would you like to install ToupTek support [y/n]?"
 	read YESNO
 	if [ $YESNO == "y" ]
 	then
@@ -145,7 +145,7 @@ then
 	fi
 
 else
-	echo "Cant find touptech SDK"
+	echo "Cant find touptek SDK"
 fi
 }
 
@@ -387,7 +387,7 @@ echo "Installing libraries into $LIB_DIR"
 #exit
 
 InstallATIK
-InstallToupTec
+InstallToupTek
 InstallFlir
 InstallZWOEAF
 
