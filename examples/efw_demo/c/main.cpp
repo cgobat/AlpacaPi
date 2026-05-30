@@ -45,13 +45,13 @@ int  main()
 
 	
 	if(iSelectedID < 0)
-	{
+    	{
 	
-		printf("open error,are you root?,press any key to exit\n");
+       		printf("open error,are you root?,press any key to exit\n");
 		getchar();
 		return -1;   
-	}
-	else
+	 }
+   	 else
 	{      
 		
 		EFW_ERROR_CODE err;
@@ -61,19 +61,19 @@ int  main()
 				break;
 			Sleep(500);
 		} 
-		printf("%d slots: ", EFWInfo.slotNum);
+         	printf("%d slots: ", EFWInfo.slotNum);
 		for(int i = 0; i < EFWInfo.slotNum; i++)
 			printf("%d ", i + 1);
-	   
+       
 		int currentSlot;
 		while(1)
-		{
+    		{
 
-			err = EFWGetPosition(iSelectedID, &currentSlot);
-			if(err != EFW_SUCCESS || currentSlot != -1 )
-				break;
-			Sleep(500);
-		} 
+        		err = EFWGetPosition(iSelectedID, &currentSlot);
+        		if(err != EFW_SUCCESS || currentSlot != -1 )
+        	    		break;
+        		Sleep(500);
+    		} 
 		printf("\ncurrent position: %d\n", currentSlot + 1);
 
 		int targetSlot;
@@ -82,8 +82,8 @@ int  main()
 		while(1)
 		{	
 			c = getchar();
-	 
-			if (EOF == c)
+     
+    			if (EOF == c)
 				continue;
 			if(c == 'q')
 				break;
@@ -100,12 +100,12 @@ int  main()
 			if(err == EFW_SUCCESS)
 				printf("\nMoving...\n");
 			while(1)
-			{
-				err = EFWGetPosition(iSelectedID, &currentSlot);
-				if(err != EFW_SUCCESS ||currentSlot != -1 )
-					break;
-				Sleep(500);
-			} 
+    			{
+       				 err = EFWGetPosition(iSelectedID, &currentSlot);
+        			if(err != EFW_SUCCESS ||currentSlot != -1 )
+            				break;
+        			Sleep(500);
+    			} 
 			printf("\nPlease input target position, type \'q\' to quit:\n");
 
 		}

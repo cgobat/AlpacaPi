@@ -75,7 +75,6 @@ AlpacaPi is a C++ implementation of the ASCOM Alpaca protocol for astronomical e
 
 ## C++ Coding Standards
 - Use C++17 (no compiler extensions).
-- **Use tabs for indentation, not spaces** - this is critical for Mark's workflow.
 - Turn on warnings: -Wall -Wextra -Wpedantic and treat as errors in CI (-Werror there only).
 - Prefer RAII + smart pointers (std::unique_ptr by default, std::shared_ptr only when ownership is shared).
 - No raw new/delete; no C-style casts; use static_cast/reinterpret_cast when necessary.

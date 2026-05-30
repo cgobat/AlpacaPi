@@ -47,8 +47,8 @@
   *
   */
 int32_t __weak lis2dh12_read_reg(stmdev_ctx_t *ctx, uint8_t reg,
-								 uint8_t *data,
-								 uint16_t len)
+                                 uint8_t *data,
+                                 uint16_t len)
 {
   int32_t ret;
 
@@ -68,8 +68,8 @@ int32_t __weak lis2dh12_read_reg(stmdev_ctx_t *ctx, uint8_t reg,
   *
   */
 int32_t __weak lis2dh12_write_reg(stmdev_ctx_t *ctx, uint8_t reg,
-								  uint8_t *data,
-								  uint16_t len)
+                                  uint8_t *data,
+                                  uint16_t len)
 {
   int32_t ret;
 
@@ -207,7 +207,7 @@ int32_t lis2dh12_temp_data_ready_get(stmdev_ctx_t *ctx, uint8_t *val)
   int32_t ret;
 
   ret = lis2dh12_read_reg(ctx, LIS2DH12_STATUS_REG_AUX,
-						  (uint8_t *)&status_reg_aux, 1);
+                          (uint8_t *)&status_reg_aux, 1);
   *val = status_reg_aux.tda;
 
   return ret;
@@ -226,7 +226,7 @@ int32_t lis2dh12_temp_data_ovr_get(stmdev_ctx_t *ctx, uint8_t *val)
   int32_t ret;
 
   ret = lis2dh12_read_reg(ctx, LIS2DH12_STATUS_REG_AUX,
-						  (uint8_t *)&status_reg_aux, 1);
+                          (uint8_t *)&status_reg_aux, 1);
   *val = status_reg_aux.tor;
 
   return ret;
@@ -259,19 +259,19 @@ int32_t lis2dh12_temperature_raw_get(stmdev_ctx_t *ctx, int16_t *val)
   *
   */
 int32_t lis2dh12_temperature_meas_set(stmdev_ctx_t *ctx,
-								      lis2dh12_temp_en_t val)
+                                      lis2dh12_temp_en_t val)
 {
   lis2dh12_temp_cfg_reg_t temp_cfg_reg;
   int32_t ret;
 
   ret = lis2dh12_read_reg(ctx, LIS2DH12_TEMP_CFG_REG,
-							 (uint8_t *)&temp_cfg_reg, 1);
+                          (uint8_t *)&temp_cfg_reg, 1);
 
   if (ret == 0)
   {
-	temp_cfg_reg.temp_en = (uint8_t) val;
-	ret = lis2dh12_write_reg(ctx, LIS2DH12_TEMP_CFG_REG,
-							 (uint8_t *)&temp_cfg_reg, 1);
+    temp_cfg_reg.temp_en = (uint8_t) val;
+    ret = lis2dh12_write_reg(ctx, LIS2DH12_TEMP_CFG_REG,
+                             (uint8_t *)&temp_cfg_reg, 1);
   }
 
   return ret;
@@ -286,22 +286,22 @@ int32_t lis2dh12_temperature_meas_set(stmdev_ctx_t *ctx,
   *
   */
 int32_t lis2dh12_temperature_meas_get(stmdev_ctx_t *ctx,
-								      lis2dh12_temp_en_t *val)
+                                      lis2dh12_temp_en_t *val)
 {
   lis2dh12_temp_cfg_reg_t temp_cfg_reg;
   int32_t ret;
 
   ret = lis2dh12_read_reg(ctx, LIS2DH12_TEMP_CFG_REG,
-							 (uint8_t *)&temp_cfg_reg, 1);
+                          (uint8_t *)&temp_cfg_reg, 1);
 
   switch (temp_cfg_reg.temp_en)
   {
-	case LIS2DH12_TEMP_DISABLE:
-		*val = LIS2DH12_TEMP_DISABLE;
-		break;
+    case LIS2DH12_TEMP_DISABLE:
+      *val = LIS2DH12_TEMP_DISABLE;
+      break;
 
-	case LIS2DH12_TEMP_ENABLE:
-		*val = LIS2DH12_TEMP_ENABLE;
+    case LIS2DH12_TEMP_ENABLE:
+      *val = LIS2DH12_TEMP_ENABLE;
       break;
 
     default:

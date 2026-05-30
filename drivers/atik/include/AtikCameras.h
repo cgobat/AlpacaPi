@@ -9,36 +9,36 @@ extern "C" {
 #ifdef WIN32
 	#include <Windows.h>	
 #else
-	#include <libusb-1.0/libusb.h>
+    #include <libusb-1.0/libusb.h>
 #endif
 
-	enum ARTEMISERROR
-	{
-		ARTEMIS_OK = 0,
-		ARTEMIS_INVALID_PARAMETER,
-		ARTEMIS_NOT_CONNECTED,
-		ARTEMIS_NOT_IMPLEMENTED,
-		ARTEMIS_NO_RESPONSE,
-		ARTEMIS_INVALID_FUNCTION,
-		ARTEMIS_NOT_INITIALIZED,
-		ARTEMIS_OPERATION_FAILED,
-		ARTEMIS_INVALID_PASSWORD
-	};
-	
-	// Colour properties
-	enum ARTEMISCOLOURTYPE
-	{
-		ARTEMIS_COLOUR_UNKNOWN = 0,
-		ARTEMIS_COLOUR_NONE,
-		ARTEMIS_COLOUR_RGGB
-	};
+    enum ARTEMISERROR
+    {
+        ARTEMIS_OK = 0,
+        ARTEMIS_INVALID_PARAMETER,
+        ARTEMIS_NOT_CONNECTED,
+        ARTEMIS_NOT_IMPLEMENTED,
+        ARTEMIS_NO_RESPONSE,
+        ARTEMIS_INVALID_FUNCTION,
+        ARTEMIS_NOT_INITIALIZED,
+        ARTEMIS_OPERATION_FAILED,
+        ARTEMIS_INVALID_PASSWORD
+    };
+    
+    // Colour properties
+    enum ARTEMISCOLOURTYPE
+    {
+        ARTEMIS_COLOUR_UNKNOWN = 0,
+        ARTEMIS_COLOUR_NONE,
+        ARTEMIS_COLOUR_RGGB
+    };
 
-	//Other enumeration types
-	enum ARTEMISPRECHARGEMODE
-	{
-		PRECHARGE_NONE = 0,		// Precharge ignored
-		PRECHARGE_ICPS,			// In-camera precharge subtraction
-		PRECHARGE_FULL,			// Precharge sent with image data
+    //Other enumeration types
+    enum ARTEMISPRECHARGEMODE
+    {
+        PRECHARGE_NONE = 0,		// Precharge ignored
+        PRECHARGE_ICPS,			// In-camera precharge subtraction
+        PRECHARGE_FULL,			// Precharge sent with image data
     };
 
     // Camera State

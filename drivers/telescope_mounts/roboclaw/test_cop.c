@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
 	printf("TEST Servo_calc_optimal_path() program 1.0 - Flip Window = %lf\n\n", gMountConfig.flipWin);
 	// printf("Input-> Mount LST startRa startDec endRa endDec\n");
 
-	// Init the data structure 
-	Servo_init(NULL, NULL);
+    // Init the data structure 
+    Servo_init(NULL, NULL);
 
 	if (argc != 2)
 	{

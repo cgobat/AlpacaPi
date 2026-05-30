@@ -492,9 +492,9 @@ char	otherString[48];
 	{
 		strcpy(otherString, "Other-");
 		strcat(otherString, filePrefix);
-		SetWidgetChecked(	(kCamSet_ObjOutline - 1), true);
-		SetWidgetText(		(kCamSet_ObjOutline - 1), otherString);
-	}
+ 		SetWidgetChecked(	(kCamSet_ObjOutline - 1), true);
+ 		SetWidgetText(		(kCamSet_ObjOutline - 1), otherString);
+  }
 }
 
 
