@@ -1,0 +1,18 @@
+[Unit]
+Description=AlpacaPi Astronomy Control Software
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=alpacapi
+Group=alpacapi
+WorkingDirectory=/home/alpacapi/AlpacaPi
+ExecStart=/usr/bin/alpacapi_start.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

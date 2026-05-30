@@ -2,15 +2,15 @@
 
 build_alpacapi () {
 	# start clean
-	rm -rf ${work_dir} *-alpacapi-${arch}.zip
+	rm -rf "${work_dir}" *-alpacapi-"${arch}".zip
 
 	# get the code and build the image
-	git clone ${src_repo} ${work_dir}
+	git clone "${src_repo}" "${work_dir}"
 	cd ${work_dir}
-	git checkout ${used_commit}
+	git checkout "${used_commit}"
 	sed -i 's@exit 1@mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc@g' scripts/dependencies_check
 	cd ..
-	cp -Rf config stage2 stage3 ${work_dir}
+	cp -Rf config stage2 stage-alpacapi "${work_dir}"
 	
 	# Remove existing container if it exists
 	docker rm -v pigen_work 2>/dev/null || true
@@ -27,7 +27,7 @@ build_alpacapi () {
 	echo "Starting pi-gen build process using $CORES CPU cores..."
 	
 	# Detect high-core systems and optimize accordingly
-	if [ $CORES -ge 16 ]; then
+	if [ "$CORES" -ge 16 ]; then
 		echo "🔥 High-core system detected! Using aggressive parallel processing..."
 		MAKE_JOBS=$CORES
 		PARALLEL_JOBS=$((CORES * 2))

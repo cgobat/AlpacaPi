@@ -12,7 +12,7 @@ cd /home/alpacapi
 if [ -d "AlpacaPi" ]; then
     rm -rf AlpacaPi
 fi
-git clone https://github.com/open-astro/AlpacaPi.git
+git clone https://github.com/mconsidine/AlpacaPi.git
 cd AlpacaPi
 git checkout openastro-alpaca
 EOF
