@@ -117,7 +117,7 @@ fi
 # Download Touptek SDK
 if [ ! -f "toupcamsdk.zip" ]; then
     echo "Downloading Touptek SDK..."
-    wget https://www.touptek.com/downloads/toupcamsdk.zip
+    curl -fsSL https://www.touptekphotonics.com/downloads/software/download.php?soft=toupcamsdk -o toupcamsdk.zip
     unzip toupcamsdk.zip
 fi
 
