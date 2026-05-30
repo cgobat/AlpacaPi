@@ -46,7 +46,7 @@ void* Display(void* params)
 	while(bDisplay)
 	{
 		cvShowImage("video", pImg);
-		
+
 		char c=cvWaitKey(1);
 		switch(c)
 		{
@@ -54,7 +54,7 @@ void* Display(void* params)
 			bDisplay = false;
 			bMain = false;
 			goto END;
-			
+
 			case 'i'://space
 			bChangeFormat = true;
 			change = change_imagetype;
@@ -106,8 +106,8 @@ int  main()
 	int CamIndex=0;
 	int inputformat;
 	int definedformat;
-	
-	
+
+
 	IplImage *pRgb;
 
 
@@ -130,7 +130,7 @@ int  main()
 	printf("\nselect one to privew\n");
 	scanf("%d", &CamIndex);
 
-	
+
 	ASIGetCameraProperty(&CamInfo, CamIndex);
 	bresult = ASIOpenCamera(CamInfo.CameraID);
 	bresult += ASIInitCamera(CamInfo.CameraID);
@@ -150,16 +150,16 @@ int  main()
 		printf("Color Camera: bayer pattern:%s\n",bayer[CamInfo.BayerPattern]);
 	else
 		printf("Mono camera\n");
-	
+
 	int ctrlnum;
 	ASIGetNumOfControls(CamInfo.CameraID, &ctrlnum);
 	ASI_CONTROL_CAPS ctrlcap;
 	for( i = 0; i < ctrlnum; i++)
 	{
 		ASIGetControlCaps(CamInfo.CameraID, i,&ctrlcap);
-			
+
 		printf("%s\n", ctrlcap.Name);
-			
+
 	}
 /*
 	ASI_SUPPORTED_MODE cammode;
@@ -185,7 +185,7 @@ int  main()
 				printf("%d:Trigger High Level Mode\n", i);
 			if(cammode.SupportedCameraMode[i]==ASI_MODE_TRIG_LOW_LEVEL)
 				printf("%d:Trigger Low  Lovel Mode\n", i);
-			
+
 			i++;
 		}
 
@@ -194,7 +194,7 @@ int  main()
 		ASIGetCameraMode(CamInfo.CameraID, &mode);
 		if(mode != cammode.SupportedCameraMode[modeIndex])
 			printf("Set mode failed!\n");
-		
+
 	}
 */
 	int bin = 1, Image_type;
@@ -247,7 +247,7 @@ int  main()
 			height = 240;
 			bin = 2;
 			Image_type = ASI_IMG_RAW8;
-			
+
 		}
 		else
 		{
@@ -258,7 +258,7 @@ int  main()
 			bin = 1;
 			Image_type = ASI_IMG_RAW8;
 		}
-		
+
 	}
 	else
 	{
@@ -270,7 +270,7 @@ int  main()
 			height = iMaxHeight;
 		}
 
-		
+
 		while(ASISetROIFormat(CamInfo.CameraID, width, height, bin, (ASI_IMG_TYPE)Image_type))//IMG_RAW8
 		{
 			printf("Set format error, please check the width and height\n ASI120's data size(width*height) must be integer multiple of 1024\n");
@@ -291,12 +291,12 @@ int  main()
 	printf("Please input exposure time(ms)\n");
 	scanf("%d", &exp_ms);
 	ASISetControlValue(CamInfo.CameraID,ASI_EXPOSURE, exp_ms*1000, ASI_FALSE);
-	ASISetControlValue(CamInfo.CameraID,ASI_GAIN,0, ASI_FALSE); 
+	ASISetControlValue(CamInfo.CameraID,ASI_GAIN,0, ASI_FALSE);
 	ASISetControlValue(CamInfo.CameraID,ASI_BANDWIDTHOVERLOAD, 40, ASI_FALSE); //low transfer speed
 	ASISetControlValue(CamInfo.CameraID,ASI_HIGH_SPEED_MODE, 0, ASI_FALSE);
 	ASISetControlValue(CamInfo.CameraID,ASI_WB_B, 90, ASI_FALSE);
  	ASISetControlValue(CamInfo.CameraID,ASI_WB_R, 48, ASI_TRUE);
-	
+
 	ASI_SUPPORTED_MODE cammode;
 	ASI_CAMERA_MODE mode;
 	if(CamInfo.IsTriggerCam)
@@ -320,7 +320,7 @@ int  main()
 				printf("%d:Trigger High Level Mode\n", i);
 			if(cammode.SupportedCameraMode[i]==ASI_MODE_TRIG_LOW_LEVEL)
 				printf("%d:Trigger Low  Lovel Mode\n", i);
-			
+
 			i++;
 		}
 
@@ -329,7 +329,7 @@ int  main()
 		ASIGetCameraMode(CamInfo.CameraID, &mode);
 		if(mode != cammode.SupportedCameraMode[modeIndex])
 			printf("Set mode failed!\n");
-		
+
 	}
 
 	ASIStartVideoCapture(CamInfo.CameraID); //start privew
@@ -357,7 +357,7 @@ int  main()
 	while(bMain)
 	{
 
-		if(mode == ASI_MODE_NORMAL) 
+		if(mode == ASI_MODE_NORMAL)
 		{
 			if(ASIGetVideoData(CamInfo.CameraID, (unsigned char*)pRgb->imageData, pRgb->imageSize, 500) == ASI_SUCCESS)
 				count++;
@@ -372,14 +372,14 @@ int  main()
 		time2 = GetTickCount();
 
 
-		
+
 		if(time2-time1 > 1000 )
 		{
 			ASIGetDroppedFrames(CamInfo.CameraID, &iDropFrmae);
 			sprintf(buf, "fps:%d dropped frames:%lu ImageType:%d",count, iDropFrmae, (int)Image_type);
 
 			count = 0;
-			time1=GetTickCount();	
+			time1=GetTickCount();
 			printf(buf);
 			printf("\n");
 
@@ -389,12 +389,12 @@ int  main()
 			iStrLen = strlen(buf);
 			CvRect rect = cvRect(iTextX, iTextY - 15, iStrLen* 11, 20);
 			cvSetImageROI(pRgb , rect);
-			cvSet(pRgb, CV_RGB(180, 180, 180)); 
+			cvSet(pRgb, CV_RGB(180, 180, 180));
 			cvResetImageROI(pRgb);
 		}
 		cvText(pRgb, buf, iTextX,iTextY );
 
-		if(bSendTiggerSignal) 
+		if(bSendTiggerSignal)
 		{
 			ASISendSoftTrigger(CamInfo.CameraID, ASI_TRUE);
 			bSendTiggerSignal = 0;
@@ -407,14 +407,14 @@ int  main()
 			pthread_join(thread_display, &retval);
 			cvReleaseImage(&pRgb);
 			ASIStopVideoCapture(CamInfo.CameraID);
-			
+
 			switch(change)
 			{
 				 case change_imagetype:
 					Image_type++;
 					if(Image_type > 3)
 						Image_type = 0;
-					
+
 					break;
 				case change_bin:
 					if(bin == 1)
@@ -423,7 +423,7 @@ int  main()
 						width/=2;
 						height/=2;
 					}
-					else 
+					else
 					{
 						bin = 1;
 						width*=2;
@@ -437,9 +437,9 @@ int  main()
 						height/= 2;
 					}
 					break;
-				
+
 				case change_size_bigger:
-				
+
 					if(width*2*bin <= iMaxWidth && height*2*bin <= iMaxHeight)
 					{
 						width*= 2;
@@ -460,7 +460,7 @@ int  main()
 		}
 	}
 END:
-	
+
 	if(bDisplay)
 	{
 		bDisplay = 0;
@@ -470,7 +470,7 @@ END:
 		Sleep(50);
 #endif
 	}
-	
+
 	ASIStopVideoCapture(CamInfo.CameraID);
 	ASICloseCamera(CamInfo.CameraID);
 	cvReleaseImage(&pRgb);

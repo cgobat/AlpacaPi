@@ -7,7 +7,7 @@
 
 AtikCamerasSDKApp::AtikCamerasSDKApp()
 {
-	
+
 
 }
 AtikCamerasSDKApp::~AtikCamerasSDKApp()
@@ -69,10 +69,10 @@ bool AtikCamerasSDKApp::AtemptConnectToCamera()
 
 	int moving, target, current;
 	ArtemisFilterWheelInfo(handle, &nFilterWheelPositions, &moving, &current, &target);
-	
+
 	canGuide = (properties.cameraflags & ARTEMIS_PROPERTIES_CAMERAFLAGS_HAS_GUIDE_PORT);
 
-	PrintCameraDetails();		
+	PrintCameraDetails();
 	return true;
 }
 void AtikCamerasSDKApp::WaitForCommand()
@@ -193,7 +193,7 @@ void AtikCamerasSDKApp::WaitForCommand()
 }
 
 void AtikCamerasSDKApp::PrintCameraDetails()
-{	
+{
 	ConsoleHelper::WriteLine("Name:           \t%s",		   properties.Description);
 	ConsoleHelper::WriteLine("Manufacturer:   \t%s",		   properties.Manufacturer);
 	ConsoleHelper::WriteLine("Pixels:         \t%d x %d",      properties.nPixelsX,      properties.nPixelsY);
@@ -210,7 +210,7 @@ void AtikCamerasSDKApp::StartExposure(const string text)
 	{
 		ConsoleHelper::WriteLine("Cannot decode parameters");
 		return;
-	}	
+	}
 
 	float seconds = atof(parameters[0].c_str());
 
@@ -221,7 +221,7 @@ void AtikCamerasSDKApp::StartExposure(const string text)
 		PrintError("Start Exposure", error);
 		return;
 	}
-		
+
 
 	int cameraState = 0;
 
@@ -284,7 +284,7 @@ void AtikCamerasSDKApp::StartExposure(const string text)
 	void * imageBuffer = ArtemisImageBuffer(handle);
 	if (imageBuffer == NULL)
 	{
-		PrintError("Get Image Buffer", error);		
+		PrintError("Get Image Buffer", error);
 		return;
 	}
 
@@ -306,7 +306,7 @@ void AtikCamerasSDKApp::GetBin()
 		PrintError("Get Binning", error);
 }
 void AtikCamerasSDKApp::SetBin(const string text)
-{	
+{
 	if (SetParameters(text) != 2)
 	{
 		ConsoleHelper::WriteLine("Cannot decode parameters");
@@ -387,7 +387,7 @@ void AtikCamerasSDKApp::StartCooling(const string text)
 	{
 		ConsoleHelper::WriteLine("No Cooling Available");
 		return;
-	}		
+	}
 
 	if (SetParameters(text) != 1)
 	{
@@ -465,7 +465,7 @@ void AtikCamerasSDKApp::TempMonitor(const string text)
 
 		Sleep(1000);
 	}
-	
+
 }
 
 void AtikCamerasSDKApp::GetFilterWheelPos()
@@ -498,7 +498,7 @@ void AtikCamerasSDKApp::SetFilterWheelPos(const string text)
 	}
 
 	int target = atoi(parameters[0].c_str());
-	
+
 	int error = ArtemisFilterWheelMove(handle, target);
 	if (error == ARTEMIS_OK)
 		ConsoleHelper::WriteLine("Set Filter Wheel Position: %d", target);
@@ -514,14 +514,14 @@ void AtikCamerasSDKApp::SetFilterWheelPos(const string text)
 			PrintError("GetFilterWheelPos", error);
 			return;
 		}
-		
+
 		ConsoleHelper::WriteLine("Moving to: %d\tCurrent %d", target, current);
 
 		if (moving == 0)
 		{
 			ConsoleHelper::WriteLine("Done!");
 			return;
-		}	
+		}
 
 		Sleep(1000);
 	}
@@ -662,7 +662,7 @@ int AtikCamerasSDKApp::SetParameters(const string text)
 			{
 				iStart   = i;
 				isInWord = true;
-			}	
+			}
 		}
 	}
 
@@ -739,7 +739,7 @@ int AtikCamerasSDKApp::SetParameters(const string text)
 
 // Checks the start of s1 (which may also contain parameters) against the whole of s2 (which is the command)
 // If s1 is longer than s2, then the next s1 character must be a space (' ').
-/*static*/ bool AtikCamerasSDKApp::StringCompare(const string s1, const string s2) 
+/*static*/ bool AtikCamerasSDKApp::StringCompare(const string s1, const string s2)
 {
 	int size = s2.size();
 	if (s1.size() < size)

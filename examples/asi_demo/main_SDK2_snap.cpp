@@ -55,7 +55,7 @@ void* Display(void* params)
 	while(bDisplay)
 	{
 		cvShowImage("video", pImg);
-		
+
 		char c=cvWaitKey(1);
 		switch(c)
 		{
@@ -63,7 +63,7 @@ void* Display(void* params)
 			bDisplay = false;
 			bMain = false;
 			goto END;
-			
+
 			case 'i'://space
 			bChangeFormat = true;
 			change = change_imagetype;
@@ -106,7 +106,7 @@ int  main()
 	char buf[128]={0};
 
 	int CamNum=0;
-	
+
 
 	IplImage *pRgb;
 
@@ -121,7 +121,7 @@ int  main()
 		printf("attached cameras:\n");
 
 	ASI_CAMERA_INFO ASICameraInfo;
-	
+
 
 	for(i = 0; i < numDevices; i++)
 	{
@@ -154,7 +154,7 @@ int  main()
 		printf("Color Camera: bayer pattern:%s\n",bayer[ASICameraInfo.BayerPattern]);
 	else
 		printf("Mono camera\n");
-	
+
 	ASI_CONTROL_CAPS ControlCaps;
 	int iNumOfCtrl = 0;
 	ASIGetNumOfControls(CamNum, &iNumOfCtrl);
@@ -208,10 +208,10 @@ int  main()
 	scanf("%d", &exp_ms);
 	ASISetControlValue(CamNum, ASI_EXPOSURE, exp_ms*1000, ASI_FALSE);
 	ASISetControlValue(CamNum, ASI_BANDWIDTHOVERLOAD, 40, ASI_FALSE);
-	
 
 
-	
+
+
 
 	bDisplay = 1;
 #ifdef _LIN
@@ -233,19 +233,19 @@ int  main()
 	while(bMain)
 	{
 
-		
+
 		ASIStartExposure(CamNum, ASI_FALSE);
 		usleep(10000);//10ms
 		status = ASI_EXP_WORKING;
 		while(status == ASI_EXP_WORKING)
 		{
-			ASIGetExpStatus(CamNum, &status);		
+			ASIGetExpStatus(CamNum, &status);
 		}
 		if(status == ASI_EXP_SUCCESS)
 		{
 			ASIGetDataAfterExp(CamNum, imgBuf, imgSize);
 			// sprintf(szTemp, "saveImage%d.jpg", bMain);
-			
+
 			if(Image_type==ASI_IMG_RAW16)
 			{
 				unsigned short *pCv16bit = (unsigned short *)(pRgb->imageData);
@@ -270,21 +270,21 @@ int  main()
    					cvSaveImage("saveImage.jpg", pRgb);
 				bSave = false;*/
 			}
-					
+
 		}
 //			ASIGetDataAfterExp(CamNum, (unsigned char*)pRgb->imageData, pRgb->imageSize);
-	
+
 		time2 = GetTickCount();
 		count++;
-		
+
 		if(time2-time1 > 1000 )
 		{
-			ASIGetDroppedFrames(CamNum, &iDropped);			
+			ASIGetDroppedFrames(CamNum, &iDropped);
 
 			count = 0;
-			time1=GetTickCount();	
+			time1=GetTickCount();
 			printf("fps:%d dropped frames:%d ImageType:%d\n",count, iDropped, Image_type);
-	
+
 
 		}
 		if(Image_type != ASI_IMG_RGB24 && Image_type != ASI_IMG_RAW16)
@@ -292,7 +292,7 @@ int  main()
 			iStrLen = strlen(buf);
 			CvRect rect = cvRect(iTextX, iTextY - 15, iStrLen* 11, 20);
 			cvSetImageROI(pRgb , rect);
-			cvSet(pRgb, CV_RGB(180, 180, 180)); 
+			cvSet(pRgb, CV_RGB(180, 180, 180));
 			cvResetImageROI(pRgb);
 		}
 		cvText(pRgb, buf, iTextX,iTextY );
@@ -303,14 +303,14 @@ int  main()
 			bDisplay = false;
 			pthread_join(thread_display, &retval);
 			cvReleaseImage(&pRgb);
-			
+
 			switch(change)
 			{
 				 case change_imagetype:
 					Image_type++;
 					if(Image_type > 3)
 						Image_type = 0;
-					
+
 					break;
 				case change_bin:
 					if(bin == 1)
@@ -319,7 +319,7 @@ int  main()
 						width/=2;
 						height/=2;
 					}
-					else 
+					else
 					{
 						bin = 1;
 						width*=2;
@@ -333,9 +333,9 @@ int  main()
 						height/= 2;
 					}
 					break;
-				
+
 				case change_size_bigger:
-				
+
 					if(width*2*bin <= iMaxWidth && height*2*bin <= iMaxHeight)
 					{
 						width*= 2;
@@ -356,7 +356,7 @@ int  main()
 		}
 	}
 END:
-	
+
 	if(bDisplay)
 	{
 		bDisplay = 0;
@@ -366,7 +366,7 @@ END:
 		Sleep(50);
 #endif
 	}
-	
+
 	ASIStopExposure(CamNum);
 	ASICloseCamera(CamNum);
 	cvReleaseImage(&pRgb);

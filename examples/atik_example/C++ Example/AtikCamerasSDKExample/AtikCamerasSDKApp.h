@@ -7,18 +7,18 @@
 
 using namespace std;
 
-enum Command 
-{ 
-	End, 
-	Help, 
-	Camera, 
-	StartExposure, 
-	GetBin, SetBin, 
-	GetSubFrame, SetSubFrame, SetSubFramePos, SetSubFrameSize, 
-	StartCooling, WarmUp, GetTemp, TempMonitor, 
-	GetFilterWheelPos, SetFilterWheelPos, 
+enum Command
+{
+	End,
+	Help,
+	Camera,
+	StartExposure,
+	GetBin, SetBin,
+	GetSubFrame, SetSubFrame, SetSubFramePos, SetSubFrameSize,
+	StartCooling, WarmUp, GetTemp, TempMonitor,
+	GetFilterWheelPos, SetFilterWheelPos,
 	Guide, GuideNSEW, PulseGuide, StopGuide,
-	UnknownCommand 
+	UnknownCommand
 };
 
 class AtikCamerasSDKApp
@@ -26,7 +26,7 @@ class AtikCamerasSDKApp
 public:
 	AtikCamerasSDKApp();
 	~AtikCamerasSDKApp();
-	
+
 	void Start();
 	void Shutdown();
 
@@ -72,13 +72,13 @@ private:
 
 private:
 	bool isInit;
-	ArtemisHandle handle;	
+	ArtemisHandle handle;
 
-	ARTEMISPROPERTIES properties;	
+	ARTEMISPROPERTIES properties;
 	int nTempSensor;
 	int nFilterWheelPositions;
 	bool canGuide;
-	
+
 	vector<string> parameters;
 };
 

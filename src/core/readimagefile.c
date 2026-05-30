@@ -50,7 +50,7 @@ enum
 	kImage_xsize,
 	kImage_ysize,
 	kImage_value,
-		
+
 	kImage_last
 };
 
@@ -83,7 +83,7 @@ int		ii;
 int		keyWordEnumValue;
 
 	keyWordEnumValue	=	-1;
-	
+
 	if (vocabList != NULL)
 	{
 		ii	=	0;
@@ -95,7 +95,7 @@ int		keyWordEnumValue;
 			}
 			ii++;
 		}
-	}	
+	}
 	return(keyWordEnumValue);
 }
 
@@ -106,7 +106,7 @@ typedef struct
 	int		xSize;
 	int		ySize;
 	char	imageType[16];
-	
+
 } TYPE_ImageInfo;
 
 //********************************************************************
@@ -118,7 +118,7 @@ bool	eolFound;
 
 	sLen		=	strlen(theString);
 	eolFound	=	false;
-	
+
 	while (sLen > 0)
 	{
 		if ((theString[sLen - 1] == 0x0d) || (theString[sLen - 1] == 0x0a))
@@ -229,7 +229,7 @@ IplImage	*openCV_Image;
 				openCV_Image->imageData[ii]	=	pixelValue;
 			}
 		}
-		
+
 		if (openCV_Image != NULL)
 		{
 			cvShowImage("camera", openCV_Image);
@@ -262,13 +262,13 @@ int				keywordEnum;
 	if (inputFileFP != NULL)
 	{
 		printf("Working on %s\t", fileName);
-		
+
 		memset(&myImageInfo, 0,sizeof(TYPE_ImageInfo));
-		
+
 		while (fgets(lineBuff, (kLineBuffSize - 2), inputFileFP))
 		{
 			linesProcessed++;
-			
+
 			RemoveCRLF(lineBuff);
 //			printf("%s\r\n", lineBuff);
 			ParseJsonLine(lineBuff, keywordString, valueString);
@@ -286,11 +286,11 @@ int				keywordEnum;
 				case kImage_ysize:
 					myImageInfo.ySize	=	atoi(valueString);
 					break;
-				
+
 				case kImage_value:
 					ReadImageValues(&myImageInfo, inputFileFP);
 					break;
-				
+
 				default:
 //					printf("Did not find keyword\r\n");
 					break;
@@ -316,7 +316,7 @@ int		fileCount;
 		exit(0);
 	}
 
-	
+
 	//*	lets look for options
 	for (argIdx = 1; argIdx < argc; argIdx++)
 	{

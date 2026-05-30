@@ -66,5 +66,5 @@ loop() {
     // Call once per minute.
     // Set the lat, long, and time and then:
     mr.calculate(latitude, longitude, t);
-  }  
+  }
 }

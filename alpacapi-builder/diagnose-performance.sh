@@ -51,7 +51,7 @@ if command -v docker >/dev/null 2>&1; then
     echo "   • Docker version: $(docker --version)"
     echo "   • Docker BuildKit: ${DOCKER_BUILDKIT:-Not set}"
     echo "   • Docker daemon status: $(systemctl is-active docker)"
-    
+
     # Check Docker daemon configuration
     if [ -f /etc/docker/daemon.json ]; then
         echo "   • Docker daemon config exists"

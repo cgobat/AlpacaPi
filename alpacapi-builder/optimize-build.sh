@@ -163,21 +163,21 @@ echo "✅ pip configured for parallel processing"
 # Additional optimizations for high-core systems
 if [ $CORES -ge 16 ]; then
     echo "🔥 Applying additional high-core optimizations..."
-    
+
     # Configure system limits for high-core builds
     echo "* soft nofile 131072" | sudo tee -a /etc/security/limits.conf
     echo "* hard nofile 131072" | sudo tee -a /etc/security/limits.conf
     echo "* soft nproc 131072" | sudo tee -a /etc/security/limits.conf
     echo "* hard nproc 131072" | sudo tee -a /etc/security/limits.conf
-    
+
     # Optimize kernel parameters for high-core systems
     echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
     echo "kernel.pid_max=4194304" | sudo tee -a /etc/sysctl.conf
     echo "fs.file-max=2097152" | sudo tee -a /etc/sysctl.conf
-    
+
     # Apply sysctl changes
     sudo sysctl -p
-    
+
     # Configure pip for high-core systems
     mkdir -p ~/.pip
     cat > ~/.pip/pip.conf << 'PIP_EOF'
@@ -190,7 +190,7 @@ upgrade = true
 [build]
 parallel = true
 PIP_EOF
-    
+
     echo "✅ High-core system optimizations applied"
 fi
 

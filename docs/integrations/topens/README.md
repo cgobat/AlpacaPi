@@ -1,4 +1,4 @@
-Automation of the Topens Roll Off Roof 
+Automation of the Topens Roll Off Roof
 
 With the kindness of Mark Sproul, we are attempting to adapt his AlpacaPi software, which was first developed to automate his observatory.
 

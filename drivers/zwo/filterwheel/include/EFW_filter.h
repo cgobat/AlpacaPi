@@ -22,7 +22,7 @@ here is the suggested procedure.
 #ifdef _WINDOWS
 #define EFW_API __declspec(dllexport)
 #else
-#define EFW_API 
+#define EFW_API
 #endif
 
 #define EFW_ID_MAX 128
@@ -84,7 +84,7 @@ int* ID: pointer to ID. the ID is a unique integer, between 0 to EFW_ID_MAX - 1,
 all the operation is base on this ID, the ID will not change.
 
 
-Return: 
+Return:
 EFW_ERROR_INVALID_INDEX: index value is invalid
 EFW_SUCCESS:  operation succeeds
 
@@ -98,7 +98,7 @@ open filter wheel
 Paras:
 int ID: the ID of filter wheel
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_GENERAL_ERROR: number of opened filter wheel reaches the maximum value.
 EFW_ERROR_REMOVED: the filter wheel is removed.
@@ -115,14 +115,14 @@ int ID: the ID of filter wheel
 
 EFW_INFO *pInfo:  pointer to structure containing the property of EFW
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_MOVING: slot number detection is in progress, generally this error will happen soon after filter wheel is connected.
 EFW_SUCCESS: operation succeeds
 EFW_ERROR_REMOVED: filter wheel is removed
 
 ***************************************************************************/
-EFW_API	EFW_ERROR_CODE EFWGetProperty(int ID, EFW_INFO *pInfo); 
+EFW_API	EFW_ERROR_CODE EFWGetProperty(int ID, EFW_INFO *pInfo);
 
 /***************************************************************************
 Descriptions:
@@ -134,16 +134,16 @@ int ID: the ID of filter wheel
 int *pPosition:  pointer to slot position, this value is between 0 to M - 1, M is slot number
 this value is -1 if filter wheel is moving
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_CLOSED: not opened
 EFW_SUCCESS: operation succeeds
 EFW_ERROR_ERROR_STATE: filter wheel is in error state
 EFW_ERROR_REMOVED: filter wheel is removed
 
-***************************************************************************/	
+***************************************************************************/
 EFW_API	EFW_ERROR_CODE EFWGetPosition(int ID, int *pPosition);
-	
+
 /***************************************************************************
 Descriptions:
 set position of slot
@@ -153,7 +153,7 @@ int ID: the ID of filter wheel
 
 int Position:  slot position, this value is between 0 to M - 1, M is slot number
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_CLOSED: not opened
 EFW_SUCCESS: operation succeeds
@@ -174,7 +174,7 @@ int ID: the ID of filter wheel
 
 bool bUnidirectional: if set as true, the filter wheel will rotate along one direction
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_CLOSED: not opened
 EFW_SUCCESS: operation succeeds
@@ -190,7 +190,7 @@ int ID: the ID of filter wheel
 
 bool *bUnidirectional: pointer to unidirection value .
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_CLOSED: not opened
 EFW_SUCCESS: operation succeeds
@@ -204,7 +204,7 @@ calibrate filter wheel
 Paras:
 int ID: the ID of filter wheel
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_ERROR_CLOSED: not opened
 EFW_SUCCESS: operation succeeds
@@ -221,14 +221,14 @@ close filter wheel
 Paras:
 int ID: the ID of filter wheel
 
-Return: 
+Return:
 EFW_ERROR_INVALID_ID: invalid ID value
 EFW_SUCCESS: operation succeeds
 ***************************************************************************/
 EFW_API	EFW_ERROR_CODE EFWClose(int ID);
 
 /***************************************************************************
-Descriptions£º
+Descriptionsï¿½ï¿½
 get version string, like "0, 4, 0824"
 ***************************************************************************/
 EFW_API char* EFWGetSDKVersion();

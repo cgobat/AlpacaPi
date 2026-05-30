@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #ifdef WIN32
-	#include <Windows.h>	
+	#include <Windows.h>
 #else
     #include <libusb-1.0/libusb.h>
 #endif
@@ -24,7 +24,7 @@ extern "C" {
         ARTEMIS_OPERATION_FAILED,
         ARTEMIS_INVALID_PASSWORD
     };
-    
+
     // Colour properties
     enum ARTEMISCOLOURTYPE
     {
@@ -165,7 +165,7 @@ extern "C" {
     void ArtemisSetDebugCallback(void(*callback)(const char *message));
 	void ArtemisSetDebugCallbackContext(void * context, void(*callback)(void *context, const char *message));
 	void ArtemisSetFirmwareDir(const char * firmwareDir);
-    void ArtemisShutdown(); 
+    void ArtemisShutdown();
 
 	// -------------------  Device --------------------------
 	bool			ArtemisDeviceIsPresent(int iDevice);
@@ -249,7 +249,7 @@ extern "C" {
 	int  ArtemisCameraSpecificOptionGetData(ArtemisHandle handle, unsigned short int id, unsigned char * data, int dataLength, int * actualLength);
 	int  ArtemisCameraSpecificOptionSetData(ArtemisHandle handle, unsigned short int id, unsigned char * data, int dataLength);
 
-	// ------------------- Column Repair ----------------------------------	
+	// ------------------- Column Repair ----------------------------------
 	int ArtemisSetColumnRepairColumns(		ArtemisHandle handle, int   nColumn, unsigned short int * columns);
 	int ArtemisGetColumnRepairColumns(		ArtemisHandle handle, int * nColumn, unsigned short int * columns);
 	int ArtemisClearColumnRepairColumns(	ArtemisHandle handle);
@@ -261,7 +261,7 @@ extern "C" {
 	int ArtemisCanInteractWithEEPROM(ArtemisHandle handle, bool * canInteract);
 	int ArtemisWriteToEEPROM(	     ArtemisHandle handle, char * password, int address, int length, const unsigned char * data);
 	int ArtemisReadFromEEPROM(	     ArtemisHandle handle, char * password, int address, int length,       unsigned char * data);
-  
+
 	// ------------------- Filter Wheel -----------------------------------
 	int ArtemisFilterWheelInfo(ArtemisHandle hCam, int *numFilters, int *moving, int *currentPos, int *targetPos);
 	int ArtemisFilterWheelMove(ArtemisHandle hCam, int targetPos);
@@ -275,7 +275,7 @@ extern "C" {
 	int ArtemisEFWSetPosition(ArtemisHandle handle, int   iPosition);
 	int ArtemisEFWGetPosition(ArtemisHandle handle, int * iPosition, bool * isMoving);
 
-	// ------------------- Firmware ----------------------------------------	
+	// ------------------- Firmware ----------------------------------------
 	bool ArtemisCanUploadFirmware(ArtemisHandle handle);
 	int  ArtemisUploadFirmware(   ArtemisHandle handle, char * fileName, char * password);
 
@@ -303,7 +303,7 @@ extern "C" {
 	int ArtemisSetLensAperture(ArtemisHandle hCam, int aperture);
 	int ArtemisSetLensFocus(   ArtemisHandle hCam, int focus);
 
-	// ------------------- Shutter ----------------------------------	
+	// ------------------- Shutter ----------------------------------
 	int ArtemisCanControlShutter( ArtemisHandle handle, bool * canControl);
 	int ArtemisOpenShutter(		  ArtemisHandle handle);
 	int ArtemisCloseShutter(	  ArtemisHandle handle);

@@ -283,7 +283,7 @@ sudo systemctl enable docker
    ```bash
    # OPTIONAL: Optimize build environment for maximum performance
    cd alpacapi-builder && ./optimize-build.sh
-   
+
    # Generate flashable image with AlpacaPi pre-installed (uses all CPU cores)
    cd alpacapi-builder && ./build_arm64.sh
    ```
@@ -333,7 +333,7 @@ cd alpacapi-builder && ./build_arm64.sh
    ```bash
    # Optimize build environment (optional but recommended)
    cd alpacapi-builder && ./optimize-build.sh
-   
+
    # Build custom Raspberry Pi OS image
    cd alpacapi-builder && ./build_arm64.sh
    ```
@@ -342,7 +342,7 @@ cd alpacapi-builder && ./build_arm64.sh
    ```bash
    # Find your SD card device
    lsblk
-   
+
    # Flash the image (replace /dev/sdX with your device)
    sudo dd if=pi-gen/work/AlpacaPi/2024-XX-XX-AlpacaPi.img of=/dev/sdX bs=4M status=progress
    ```

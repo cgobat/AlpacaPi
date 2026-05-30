@@ -9,7 +9,7 @@ any question feel free contact us:yang.zhou@zwoptical.com
 #ifdef _WINDOWS
 #define EAF_API __declspec(dllexport)
 #else
-#define EAF_API 
+#define EAF_API
 #endif
 
 #define EAF_ID_MAX 128
@@ -91,7 +91,7 @@ int* ID: pointer to ID. the ID is a unique integer, between 0 to EAF_ID_MAX - 1,
 all the operation is base on this ID, the ID will not change.
 
 
-Return: 
+Return:
 EAF_ERROR_INVALID_INDEX: index value is invalid
 EAF_SUCCESS:  operation succeeds
 
@@ -105,7 +105,7 @@ Open focuser
 Paras:
 int ID: the ID of focuser
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_GENERAL_ERROR: number of opened focuser reaches the maximum value.
 EAF_ERROR_REMOVED: the focuser is removed.
@@ -122,13 +122,13 @@ int ID: the ID of focuser
 
 EAF_INFO *pInfo:  pointer to structure containing the property of EAF
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_SUCCESS: operation succeeds
 
 ***************************************************************************/
 
-EAF_API	EAF_ERROR_CODE EAFGetProperty(int ID, EAF_INFO *pInfo); 
+EAF_API	EAF_ERROR_CODE EAFGetProperty(int ID, EAF_INFO *pInfo);
 
 
 
@@ -141,7 +141,7 @@ int ID: the ID of focuser
 
 int iStep: step value is between 0 to EAF_INFO::MaxStep
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -159,7 +159,7 @@ Stop moving.
 Paras:
 int ID: the ID of focuser
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -167,7 +167,7 @@ EAF_ERROR_ERROR_STATE: focuser is in error state
 EAF_ERROR_REMOVED: focuser is removed
 
 ***************************************************************************/
-EAF_API	EAF_ERROR_CODE EAFStop(int ID); 
+EAF_API	EAF_ERROR_CODE EAFStop(int ID);
 
 
 /***************************************************************************
@@ -178,7 +178,7 @@ Paras:
 int ID: the ID of focuser
 bool *pbVal: pointer to the value, imply if focuser is moving
 bool* pbHandControl: pointer to the value, imply focuser is moved by handle control, can't be stopped by calling EAFStop()
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -186,7 +186,7 @@ EAF_ERROR_ERROR_STATE: focuser is in error state
 EAF_ERROR_REMOVED: focuser is removed
 
 ***************************************************************************/
-EAF_API	EAF_ERROR_CODE EAFIsMoving(int ID, bool *pbVal, bool* pbHandControl); 
+EAF_API	EAF_ERROR_CODE EAFIsMoving(int ID, bool *pbVal, bool* pbHandControl);
 
 
 /***************************************************************************
@@ -197,7 +197,7 @@ Paras:
 int ID: the ID of focuser
 bool *piStep: pointer to the value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -215,7 +215,7 @@ Paras:
 int ID: the ID of focuser
 int iStep: step value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -233,7 +233,7 @@ Paras:
 int ID: the ID of focuser
 bool *pfTemp: pointer to the value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -245,13 +245,13 @@ EAF_API	EAF_ERROR_CODE EAFGetTemp(int ID, float* pfTemp);
 
 /***************************************************************************
 Descriptions:
-Turn on/off beep, if true the focuser will beep at the moment when it begins to move 
+Turn on/off beep, if true the focuser will beep at the moment when it begins to move
 
 Paras:
 int ID: the ID of focuser
 bool bVal: turn on beep if true
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -263,13 +263,13 @@ EAF_API	EAF_ERROR_CODE EAFSetBeep(int ID, bool bVal);
 
 /***************************************************************************
 Descriptions:
-Get if beep is turned on 
+Get if beep is turned on
 
 Paras:
 int ID: the ID of focuser
 bool *pbVal: pointer to the value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -287,7 +287,7 @@ Paras:
 int ID: the ID of focuser
 int iVal: maximum position
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -305,7 +305,7 @@ Paras:
 int ID: the ID of focuser
 bool *piVal: pointer to the value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -323,7 +323,7 @@ Paras:
 int ID: the ID of focuser
 bool *piVal: pointer to the value
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -342,7 +342,7 @@ int ID: the ID of focuser
 
 bool bVal: if set as true, the focuser will move along reverse direction
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -358,7 +358,7 @@ int ID: the ID of focuser
 
 bool *pbVal: pointer to direction value.
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -374,7 +374,7 @@ int ID: the ID of focuser
 
 int iVal: backlash value.
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_INVALID_VALUE: iVal needs to be between 0 and 255
 EAF_ERROR_CLOSED: not opened
@@ -391,7 +391,7 @@ int ID: the ID of focuser
 
 int *piVal: pointer to backlash value.
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -405,7 +405,7 @@ Close focuser
 Paras:
 int ID: the ID of focuser
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_SUCCESS: operation succeeds
 ***************************************************************************/
@@ -426,7 +426,7 @@ int ID: the ID of focuser
 
 int *major, int *minor, int *build: pointer to value.
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EAF_SUCCESS: operation succeeds
@@ -442,7 +442,7 @@ int ID: the ID of focuser
 
 EAF_SN* pSN: pointer to SN
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EFW_ERROR_NOT_SUPPORTED: the firmware does not support serial number
@@ -459,7 +459,7 @@ int ID: the ID of focuser
 
 EAF_ID alias: the struct which contains the alias
 
-Return: 
+Return:
 EAF_ERROR_INVALID_ID: invalid ID value
 EAF_ERROR_CLOSED: not opened
 EFW_ERROR_NOT_SUPPORTED: the firmware does not support setting alias

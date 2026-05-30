@@ -32,7 +32,7 @@ April 1989, page 78.
 ## Usage
 
 To use the MoonRise library, include MoonRise.h
-	
+
 	#include <MoonRise.h>
 
 ### Detailed synopsis
@@ -45,7 +45,7 @@ To use the MoonRise library, include MoonRise.h
 		from -90 (south pole) to 90 (north pole).  Longitude ranges
 		from -180 (west of Greenwich) to 180 (east of Greenwich).
 
-	time:  
+	time:
 		The time to search for events, in UTC seconds from the Unix
 		epoch (January 1, 1970).  The closest moon rise/set event will
 		be found before and after this time.  In polar regions there

@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 double		currRa, currDec;
 
 Servo_init(kOBSERV_CFG_FILE, kMOUNT_CFG_FILE, kMOTION_CFG_FILE);
-Servo_unpark(); 
+Servo_unpark();
 
 printf("SERVO MOVE Utility - stops mount and then moves mount relative hours and degrees\n");
 printf("USAGE ->  1 15 <RET> moves +1 hour in RA and +15 degs in Dec\n");

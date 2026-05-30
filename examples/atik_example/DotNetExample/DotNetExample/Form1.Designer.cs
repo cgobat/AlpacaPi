@@ -65,9 +65,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.GainUpDown)).BeginInit();
             this.FastModeBox.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // FindButton
-            // 
+            //
             this.FindButton.Location = new System.Drawing.Point(13, 13);
             this.FindButton.Name = "FindButton";
             this.FindButton.Size = new System.Drawing.Size(75, 23);
@@ -75,9 +75,9 @@
             this.FindButton.Text = "Find Cameras";
             this.FindButton.UseVisualStyleBackColor = true;
             this.FindButton.Click += new System.EventHandler(this.Find_Click);
-            // 
+            //
             // CameraComboBox
-            // 
+            //
             this.CameraComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CameraComboBox.FormattingEnabled = true;
             this.CameraComboBox.Location = new System.Drawing.Point(94, 12);
@@ -85,9 +85,9 @@
             this.CameraComboBox.Size = new System.Drawing.Size(121, 21);
             this.CameraComboBox.TabIndex = 1;
             this.CameraComboBox.SelectedIndexChanged += new System.EventHandler(this.CameraComboBox_SelectedIndexChanged);
-            // 
+            //
             // Connect
-            // 
+            //
             this.Connect.Enabled = false;
             this.Connect.Location = new System.Drawing.Point(222, 13);
             this.Connect.Name = "Connect";
@@ -96,9 +96,9 @@
             this.Connect.Text = "Connect";
             this.Connect.UseVisualStyleBackColor = true;
             this.Connect.Click += new System.EventHandler(this.Connect_Click);
-            // 
+            //
             // StartExposureButton
-            // 
+            //
             this.StartExposureButton.Enabled = false;
             this.StartExposureButton.Location = new System.Drawing.Point(13, 50);
             this.StartExposureButton.Name = "StartExposureButton";
@@ -107,9 +107,9 @@
             this.StartExposureButton.Text = "Start Exposure";
             this.StartExposureButton.UseVisualStyleBackColor = true;
             this.StartExposureButton.Click += new System.EventHandler(this.StartExposureButton_Click);
-            // 
+            //
             // StartCoolingButton
-            // 
+            //
             this.StartCoolingButton.Enabled = false;
             this.StartCoolingButton.Location = new System.Drawing.Point(13, 171);
             this.StartCoolingButton.Name = "StartCoolingButton";
@@ -118,9 +118,9 @@
             this.StartCoolingButton.Text = "Start Cooling";
             this.StartCoolingButton.UseVisualStyleBackColor = true;
             this.StartCoolingButton.Click += new System.EventHandler(this.StartCoolingButton_Click);
-            // 
+            //
             // PictureBox
-            // 
+            //
             this.PictureBox.BackColor = System.Drawing.SystemColors.WindowText;
             this.PictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.PictureBox.Location = new System.Drawing.Point(131, 50);
@@ -128,9 +128,9 @@
             this.PictureBox.Size = new System.Drawing.Size(685, 636);
             this.PictureBox.TabIndex = 5;
             this.PictureBox.TabStop = false;
-            // 
+            //
             // StopExposure
-            // 
+            //
             this.StopExposure.Enabled = false;
             this.StopExposure.Location = new System.Drawing.Point(13, 92);
             this.StopExposure.Name = "StopExposure";
@@ -139,9 +139,9 @@
             this.StopExposure.Text = "Stop Exposure";
             this.StopExposure.UseVisualStyleBackColor = true;
             this.StopExposure.Click += new System.EventHandler(this.StopExposure_Click);
-            // 
+            //
             // Disconnect
-            // 
+            //
             this.Disconnect.Enabled = false;
             this.Disconnect.Location = new System.Drawing.Point(304, 13);
             this.Disconnect.Name = "Disconnect";
@@ -150,9 +150,9 @@
             this.Disconnect.Text = "Disconnect";
             this.Disconnect.UseVisualStyleBackColor = true;
             this.Disconnect.Click += new System.EventHandler(this.Disconnect_Click);
-            // 
+            //
             // StopCooling
-            // 
+            //
             this.StopCooling.Enabled = false;
             this.StopCooling.Location = new System.Drawing.Point(13, 200);
             this.StopCooling.Name = "StopCooling";
@@ -161,54 +161,54 @@
             this.StopCooling.Text = "Stop Cooling";
             this.StopCooling.UseVisualStyleBackColor = true;
             this.StopCooling.Click += new System.EventHandler(this.StopCooling_Click);
-            // 
+            //
             // ConnectedLabel
-            // 
+            //
             this.ConnectedLabel.AutoSize = true;
             this.ConnectedLabel.Location = new System.Drawing.Point(385, 18);
             this.ConnectedLabel.Name = "ConnectedLabel";
             this.ConnectedLabel.Size = new System.Drawing.Size(79, 13);
             this.ConnectedLabel.TabIndex = 9;
             this.ConnectedLabel.Text = "Not Connected";
-            // 
+            //
             // ExposureStatus
-            // 
+            //
             this.ExposureStatus.AutoSize = true;
             this.ExposureStatus.Location = new System.Drawing.Point(19, 146);
             this.ExposureStatus.Name = "ExposureStatus";
             this.ExposureStatus.Size = new System.Drawing.Size(24, 13);
             this.ExposureStatus.TabIndex = 10;
             this.ExposureStatus.Text = "Idle";
-            // 
+            //
             // Temperature
-            // 
+            //
             this.Temperature.AutoSize = true;
             this.Temperature.Location = new System.Drawing.Point(16, 239);
             this.Temperature.Name = "Temperature";
             this.Temperature.Size = new System.Drawing.Size(60, 13);
             this.Temperature.TabIndex = 11;
             this.Temperature.Text = "No Camera";
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 226);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(70, 13);
             this.label1.TabIndex = 12;
             this.label1.Text = "Temperature:";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(13, 133);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(54, 13);
             this.label2.TabIndex = 13;
             this.label2.Text = "Exposure:";
-            // 
+            //
             // CMOSOptionsBox
-            // 
+            //
             this.CMOSOptionsBox.Controls.Add(this.OffsetBox);
             this.CMOSOptionsBox.Controls.Add(this.GainBox);
             this.CMOSOptionsBox.Controls.Add(this.GOModeComboBox);
@@ -221,9 +221,9 @@
             this.CMOSOptionsBox.TabStop = false;
             this.CMOSOptionsBox.Text = "CMOS Options";
             this.CMOSOptionsBox.Visible = false;
-            // 
+            //
             // OffsetBox
-            // 
+            //
             this.OffsetBox.Controls.Add(this.OffsetUpDown);
             this.OffsetBox.Location = new System.Drawing.Point(6, 101);
             this.OffsetBox.Name = "OffsetBox";
@@ -232,17 +232,17 @@
             this.OffsetBox.TabStop = false;
             this.OffsetBox.Text = "Offset";
             this.OffsetBox.Visible = false;
-            // 
+            //
             // OffsetUpDown
-            // 
+            //
             this.OffsetUpDown.Location = new System.Drawing.Point(6, 19);
             this.OffsetUpDown.Name = "OffsetUpDown";
             this.OffsetUpDown.Size = new System.Drawing.Size(63, 20);
             this.OffsetUpDown.TabIndex = 3;
             this.OffsetUpDown.ValueChanged += new System.EventHandler(this.OffsetUpDown_ValueChanged);
-            // 
+            //
             // GainBox
-            // 
+            //
             this.GainBox.Controls.Add(this.GainUpDown);
             this.GainBox.Location = new System.Drawing.Point(6, 47);
             this.GainBox.Name = "GainBox";
@@ -251,17 +251,17 @@
             this.GainBox.TabStop = false;
             this.GainBox.Text = "Gain";
             this.GainBox.Visible = false;
-            // 
+            //
             // GainUpDown
-            // 
+            //
             this.GainUpDown.Location = new System.Drawing.Point(6, 19);
             this.GainUpDown.Name = "GainUpDown";
             this.GainUpDown.Size = new System.Drawing.Size(63, 20);
             this.GainUpDown.TabIndex = 1;
             this.GainUpDown.ValueChanged += new System.EventHandler(this.GainUpDown_ValueChanged);
-            // 
+            //
             // GOModeComboBox
-            // 
+            //
             this.GOModeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.GOModeComboBox.FormattingEnabled = true;
             this.GOModeComboBox.Items.AddRange(new object[] {
@@ -274,9 +274,9 @@
             this.GOModeComboBox.Size = new System.Drawing.Size(85, 21);
             this.GOModeComboBox.TabIndex = 8;
             this.GOModeComboBox.SelectedIndexChanged += new System.EventHandler(this.GOModeComboBox_SelectedIndexChanged);
-            // 
+            //
             // EvenIlluminationCheckBox
-            // 
+            //
             this.EvenIlluminationCheckBox.AutoSize = true;
             this.EvenIlluminationCheckBox.CheckAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.EvenIlluminationCheckBox.Location = new System.Drawing.Point(4, 205);
@@ -286,9 +286,9 @@
             this.EvenIlluminationCheckBox.Text = "Even Illumination";
             this.EvenIlluminationCheckBox.UseVisualStyleBackColor = true;
             this.EvenIlluminationCheckBox.CheckedChanged += new System.EventHandler(this.EvenIlluminationCheckBox_CheckedChanged);
-            // 
+            //
             // PadDataCheckBox
-            // 
+            //
             this.PadDataCheckBox.AutoSize = true;
             this.PadDataCheckBox.CheckAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.PadDataCheckBox.Location = new System.Drawing.Point(20, 160);
@@ -298,9 +298,9 @@
             this.PadDataCheckBox.Text = "Pad Data";
             this.PadDataCheckBox.UseVisualStyleBackColor = true;
             this.PadDataCheckBox.CheckedChanged += new System.EventHandler(this.PadDataCheckBox_CheckedChanged);
-            // 
+            //
             // FastModeBox
-            // 
+            //
             this.FastModeBox.Controls.Add(this.fpsValueLabel);
             this.FastModeBox.Controls.Add(this.fpsLabel);
             this.FastModeBox.Controls.Add(this.StopFastModeButton);
@@ -314,9 +314,9 @@
             this.FastModeBox.TabStop = false;
             this.FastModeBox.Text = "Fast Mode";
             this.FastModeBox.Visible = false;
-            // 
+            //
             // StopFastModeButton
-            // 
+            //
             this.StopFastModeButton.Enabled = false;
             this.StopFastModeButton.Location = new System.Drawing.Point(7, 117);
             this.StopFastModeButton.Name = "StopFastModeButton";
@@ -325,9 +325,9 @@
             this.StopFastModeButton.Text = "Stop FM";
             this.StopFastModeButton.UseVisualStyleBackColor = true;
             this.StopFastModeButton.Click += new System.EventHandler(this.StopFastModeButton_Click);
-            // 
+            //
             // StartFastModeButton
-            // 
+            //
             this.StartFastModeButton.Location = new System.Drawing.Point(7, 87);
             this.StartFastModeButton.Name = "StartFastModeButton";
             this.StartFastModeButton.Size = new System.Drawing.Size(75, 23);
@@ -335,9 +335,9 @@
             this.StartFastModeButton.Text = "Start FM";
             this.StartFastModeButton.UseVisualStyleBackColor = true;
             this.StartFastModeButton.Click += new System.EventHandler(this.StartFastModeButton_Click);
-            // 
+            //
             // BitSendModeBox
-            // 
+            //
             this.BitSendModeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.BitSendModeBox.FormattingEnabled = true;
             this.BitSendModeBox.Items.AddRange(new object[] {
@@ -348,9 +348,9 @@
             this.BitSendModeBox.Size = new System.Drawing.Size(84, 21);
             this.BitSendModeBox.TabIndex = 1;
             this.BitSendModeBox.SelectedIndexChanged += new System.EventHandler(this.BitSendModeBox_SelectedIndexChanged);
-            // 
+            //
             // ExposureSpeedBox
-            // 
+            //
             this.ExposureSpeedBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ExposureSpeedBox.FormattingEnabled = true;
             this.ExposureSpeedBox.Items.AddRange(new object[] {
@@ -362,27 +362,27 @@
             this.ExposureSpeedBox.Size = new System.Drawing.Size(85, 21);
             this.ExposureSpeedBox.TabIndex = 0;
             this.ExposureSpeedBox.SelectedIndexChanged += new System.EventHandler(this.ExposureSpeedBox_SelectedIndexChanged);
-            // 
+            //
             // fpsLabel
-            // 
+            //
             this.fpsLabel.AutoSize = true;
             this.fpsLabel.Location = new System.Drawing.Point(7, 147);
             this.fpsLabel.Name = "fpsLabel";
             this.fpsLabel.Size = new System.Drawing.Size(30, 13);
             this.fpsLabel.TabIndex = 4;
             this.fpsLabel.Text = "FPS:";
-            // 
+            //
             // fpsValueLabel
-            // 
+            //
             this.fpsValueLabel.AutoSize = true;
             this.fpsValueLabel.Location = new System.Drawing.Point(44, 147);
             this.fpsValueLabel.Name = "fpsValueLabel";
             this.fpsValueLabel.Size = new System.Drawing.Size(22, 13);
             this.fpsValueLabel.TabIndex = 5;
             this.fpsValueLabel.Text = "0.0";
-            // 
+            //
             // Form1
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;

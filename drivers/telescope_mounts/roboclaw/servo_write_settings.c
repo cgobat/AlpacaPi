@@ -12,7 +12,7 @@
 
 int main(void)
 {
-int status = kSTATUS_OK; 
+int status = kSTATUS_OK;
 
 Servo_init(kOBSERV_CFG_FILE, kMOUNT_CFG_FILE, kMOTION_CFG_FILE);
 

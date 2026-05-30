@@ -224,7 +224,7 @@ unsigned int	seedValue;
 		seedValue	=	atoi(argv[1]);
 		srand(seedValue);
 	}
-	
+
 	printf("Stat gen\r\n");
 
 	STAT_GenerateData_SD(100.0, 3, kNumValues, array);
@@ -233,12 +233,12 @@ unsigned int	seedValue;
 	{
 //		printf("[%4d]=%f\r\n", ii, array[ii]);
 	}
-	
+
 	meanAvg		=	STAT_CalcMean(kNumValues, array);
 	variance	=	STAT_CalcVariance(kNumValues, array);
-	
+
 	std_deviation	=	sqrt(variance);
-	
+
 	CONSOLE_DEBUG_W_DBL("mean",				meanAvg);
 	CONSOLE_DEBUG_W_DBL("variance",			variance);
 	CONSOLE_DEBUG_W_DBL("std_deviation",	std_deviation);

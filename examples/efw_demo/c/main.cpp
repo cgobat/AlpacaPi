@@ -9,8 +9,8 @@
 #endif
 int  main()
 {
-	
-	int EFW_count = EFWGetNum();  
+
+	int EFW_count = EFWGetNum();
 	if(EFW_count <= 0)
 	{
 		printf("no filter wheel connected, press any key to exit\n");
@@ -21,7 +21,7 @@ int  main()
 		printf("attached filter wheel:\n");
 
 	EFW_INFO EFWInfo;
-	
+
 
 	for(int i = 0; i < EFW_count; i++)
 	{
@@ -43,28 +43,28 @@ int  main()
 		return -1;
 	}
 
-	
+
 	if(iSelectedID < 0)
     	{
-	
+
        		printf("open error,are you root?,press any key to exit\n");
 		getchar();
-		return -1;   
+		return -1;
 	 }
    	 else
-	{      
-		
+	{
+
 		EFW_ERROR_CODE err;
 		while(1){
 			err = EFWGetProperty(iSelectedID, & EFWInfo);
 			if(err != EFW_ERROR_MOVING )
 				break;
 			Sleep(500);
-		} 
+		}
          	printf("%d slots: ", EFWInfo.slotNum);
 		for(int i = 0; i < EFWInfo.slotNum; i++)
 			printf("%d ", i + 1);
-       
+
 		int currentSlot;
 		while(1)
     		{
@@ -73,16 +73,16 @@ int  main()
         		if(err != EFW_SUCCESS || currentSlot != -1 )
         	    		break;
         		Sleep(500);
-    		} 
+    		}
 		printf("\ncurrent position: %d\n", currentSlot + 1);
 
 		int targetSlot;
 		char c;
 		printf("\nPlease input target position, type \'q\' to quit:\n");
 		while(1)
-		{	
+		{
 			c = getchar();
-     
+
     			if (EOF == c)
 				continue;
 			if(c == 'q')
@@ -91,11 +91,11 @@ int  main()
 				targetSlot = c - '0';
 			else
 				continue;
-			
+
 			targetSlot--;
 			if(targetSlot < 0 || targetSlot >=  EFWInfo.slotNum)
 				continue;
-			
+
 			err = EFWSetPosition(iSelectedID, targetSlot);
 			if(err == EFW_SUCCESS)
 				printf("\nMoving...\n");
@@ -105,7 +105,7 @@ int  main()
         			if(err != EFW_SUCCESS ||currentSlot != -1 )
             				break;
         			Sleep(500);
-    			} 
+    			}
 			printf("\nPlease input target position, type \'q\' to quit:\n");
 
 		}

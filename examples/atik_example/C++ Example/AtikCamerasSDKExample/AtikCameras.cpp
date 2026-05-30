@@ -15,9 +15,9 @@
 // Interface functions for Artemis CCD Camera Library
 //
 
-#ifdef _WIN32	
+#ifdef _WIN32
 #include <windows.h>
-#include <comdef.h>	
+#include <comdef.h>
 #else
 #include <dlfcn.h>
 typedef void * FARPROC;
@@ -979,7 +979,7 @@ extern "C"
 
 		return method(handle, bSwitched);
 	}
-		
+
 	// ------------ Camera Specific Options -------------
 	artfn bool ArtemisHasCameraSpecificOption(    ArtemisHandle handle, unsigned short id)
 	{
@@ -1018,7 +1018,7 @@ extern "C"
 		return method(handle, id, data, dataLength);
 	}
 
-	// ------------------- Column Repair ----------------------------------	
+	// ------------------- Column Repair ----------------------------------
 	artfn int ArtemisSetColumnRepairColumns(		ArtemisHandle handle, int   nColumn, unsigned short * columns)
 	{
 		static AtikMethod_ArtemisSetColumnRepairColumns method = NULL;
@@ -1264,8 +1264,8 @@ extern "C"
 
 		return method(handle, iPosition, isMoving);
 	}
-	
-	// ------------------- Firmware ----------------------------------------	
+
+	// ------------------- Firmware ----------------------------------------
 	artfn bool ArtemisCanUploadFirmware(ArtemisHandle handle)
 	{
 		static AtikMethod_B_H method = NULL;
@@ -1491,7 +1491,7 @@ extern "C"
 		return method(handle, focus);
 	}
 
-	// ------------------- Shutter ----------------------------------		
+	// ------------------- Shutter ----------------------------------
 	artfn int ArtemisCanControlShutter( ArtemisHandle handle, bool * canControl)
 	{
 		static AtikMethod_I_Hb method = NULL;
@@ -1650,7 +1650,7 @@ extern "C"
 
 		return method(handle, windowHeaterPower);
 	}
-	
+
 
 #include <iostream>
 

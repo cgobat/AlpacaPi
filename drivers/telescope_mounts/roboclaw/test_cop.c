@@ -14,7 +14,7 @@
 #include "servo_mount_cfg.h"
 #include "servo_mount.h"
 
-// Minimum globals needed for the test program, copied from servo_mount.c 
+// Minimum globals needed for the test program, copied from servo_mount.c
 extern TYPE_MOUNT_CONFIG gMountConfig;
 static char gDebugInfoCOP[] = "00000";
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	printf("TEST Servo_calc_optimal_path() program 1.0 - Flip Window = %lf\n\n", gMountConfig.flipWin);
 	// printf("Input-> Mount LST startRa startDec endRa endDec\n");
 
-    // Init the data structure 
+    // Init the data structure
     Servo_init(NULL, NULL);
 
 	if (argc != 2)

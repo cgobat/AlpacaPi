@@ -224,7 +224,7 @@ namespace DotNetExample
         private void Disconnect_Click(object sender, EventArgs e)
         {
             checkTemperature = false;
-            // Stop cooling otherwise camera will continue 
+            // Stop cooling otherwise camera will continue
             // to cool when disconnected
             if (StopCooling.Enabled)
             {

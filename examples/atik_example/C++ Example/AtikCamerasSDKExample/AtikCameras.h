@@ -224,7 +224,7 @@ extern "C"
 	artfn char* ArtemisLastStartTime(			 ArtemisHandle handle);
 	artfn int   ArtemisLastStartTimeMilliseconds(ArtemisHandle handle);
 	artfn int   ArtemisClearVReg(				 ArtemisHandle handle);
-	
+
 	artfn BOOL ArtemisHasFastMode(      ArtemisHandle handle);
 	artfn BOOL ArtemisStartFastExposure(ArtemisHandle handle, int ms);
 	artfn BOOL ArtemisSetFastCallback(  ArtemisHandle handle, void(*callback)(ArtemisHandle handle, int x, int y, int w, int h, int binx, int biny, void * imageBuffer));
@@ -233,13 +233,13 @@ extern "C"
 	artfn int  ArtemisAmplifier(		   ArtemisHandle handle, bool bOn);
 	artfn BOOL ArtemisGetAmplifierSwitched(ArtemisHandle handle);
 	artfn int  ArtemisSetAmplifierSwitched(ArtemisHandle handle, bool bSwitched);
-		
+
 	// ------------ Camera Specific Options -------------
 	artfn bool ArtemisHasCameraSpecificOption(    ArtemisHandle handle, unsigned short id);
 	artfn int  ArtemisCameraSpecificOptionGetData(ArtemisHandle handle, unsigned short id, unsigned char * data, int dataLength, int & actualLength);
 	artfn int  ArtemisCameraSpecificOptionSetData(ArtemisHandle handle, unsigned short id, unsigned char * data, int dataLength);
 
-	// ------------------- Column Repair ----------------------------------	
+	// ------------------- Column Repair ----------------------------------
 	artfn int ArtemisSetColumnRepairColumns(		ArtemisHandle handle, int   nColumn, unsigned short * columns);
 	artfn int ArtemisGetColumnRepairColumns(		ArtemisHandle handle, int * nColumn, unsigned short * columns);
 	artfn int ArtemisClearColumnRepairColumns(		ArtemisHandle handle);
@@ -265,8 +265,8 @@ extern "C"
 	artfn int			ArtemisEFWNmrPosition(ArtemisHandle handle, int * nPosition);
 	artfn int			ArtemisEFWSetPosition(ArtemisHandle handle, int   iPosition);
 	artfn int			ArtemisEFWGetPosition(ArtemisHandle handle, int * iPosition, bool * isMoving);
-	
-	// ------------------- Firmware ----------------------------------------	
+
+	// ------------------- Firmware ----------------------------------------
 	artfn bool ArtemisCanUploadFirmware(ArtemisHandle handle);
 	artfn int  ArtemisUploadFirmware(   ArtemisHandle handle, char * fileName, char * password);
 
@@ -294,7 +294,7 @@ extern "C"
 	artfn int ArtemisSetLensAperture(ArtemisHandle handle, int aperture);
 	artfn int ArtemisSetLensFocus(   ArtemisHandle handle, int focus);
 
-	// ------------------- Shutter ----------------------------------		
+	// ------------------- Shutter ----------------------------------
 	artfn int ArtemisCanControlShutter( ArtemisHandle handle, bool * canControl);
 	artfn int ArtemisOpenShutter(		ArtemisHandle handle);
 	artfn int ArtemisCloseShutter(	    ArtemisHandle handle);
@@ -310,7 +310,7 @@ extern "C"
 	artfn int ArtemisCoolerWarmUp(		   ArtemisHandle handle);
 	artfn int ArtemisGetWindowHeaterPower( ArtemisHandle handle, int* windowHeaterPower);
 	artfn int ArtemisSetWindowHeaterPower( ArtemisHandle handle, int  windowHeaterPower);
-	
+
 
 
 	// Try to load the Artemis DLL.

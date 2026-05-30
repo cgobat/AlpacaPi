@@ -142,7 +142,7 @@ class CameraDriver_NewModel : public AlpacaDriver {
 public:
     CameraDriver_NewModel();
     ~CameraDriver_NewModel();
-    
+
     // Implement required methods
     bool Connect() override;
     bool Disconnect() override;

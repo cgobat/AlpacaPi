@@ -1209,8 +1209,8 @@ int			len;
 	// otherwise, setting it to 1 means stop any running cmds and execute it *now*
 	now	=	(buffered == true) ? 0 : 1;
 	// printf("RC_move_by_posvad: now=%d\n", now);
-	
-	// add buffer arg	
+
+	// add buffer arg
 	Note_add_byte(ptrA, now, &ptrB);
 
 	// Get length and calc CRC then add it the note
@@ -1395,7 +1395,7 @@ uint8_t		addr	=	0x80; // Default addr for RC MC
 double		propo, integ, deriv;
 uint32_t	iMax, deadZ;
 int32_t		minP, maxP;
-int 		i; 
+int 		i;
 
 
 	// Mark, Ignore this one line if format, need to see more statements on one screen, it's just for testing
@@ -1484,7 +1484,7 @@ int 		i;
 		if (RC_move_by_posva(addr, SERVO_RA_AXIS, 0, 60000, 15000, false) == kERROR)	printf("DEC RC_move_by_pos returned error\n");
 		printf("Hit return to end loop and add buffered move\n");
 		fgets(buf, 256, stdin);
-	
+
 		if (RC_move_by_vela(addr, SERVO_RA_AXIS, 5000, 15000, true) == kERROR)			printf("DEC RC_move_by_vela returned error\n");
 		// if (RC_move_by_posva(addr, SERVO_RA_AXIS, 1000000, 5000, 15000, true) == kERROR)	printf("DEC RC_move_by_pos returned error\n");
 		// if (RC_check_queue(addr, &raDepth, &decDepth) == kERROR)						printf("RC_check_queue returned error\n");

@@ -9,7 +9,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	AtikCamerasSDKApp app;
 	app.Start();
-	app.Shutdown();	
+	app.Shutdown();
 
 	return 0;
 }

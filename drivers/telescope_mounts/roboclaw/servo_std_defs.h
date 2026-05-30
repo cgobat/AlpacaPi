@@ -67,7 +67,7 @@
 #define	kSIDER_RATE_ARCSECS	15.04106864
 #define	kLUNAR_RATE_ARCSECS	14.497 // from NASA Horizons DB, average of 31 days vs. ASCOM 15.465
 #define	kSOLAR_RATE_ARCSECS	15.0
-#define	kKING_RATE_ARCSECS	15.0369 
+#define	kKING_RATE_ARCSECS	15.0369
 
 #define	SERVO_RA_AXIS	(uint8_t)0
 #define	SERVO_DEC_AXIS	(uint8_t)1

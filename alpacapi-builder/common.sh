@@ -11,21 +11,21 @@ build_alpacapi () {
 	sed -i 's@exit 1@mount -t binfmt_misc binfmt_misc /proc/sys/fs/binfmt_misc@g' scripts/dependencies_check
 	cd ..
 	cp -Rf config stage2 stage3 ${work_dir}
-	
+
 	# Remove existing container if it exists
 	docker rm -v pigen_work 2>/dev/null || true
-	
+
 	cd ${work_dir}
-	
+
 	# Set environment variables that pi-gen might need
 	export IMG_NAME="alpacapi"
 	export RELEASE="trixie"
 	export ARCH="${arch}"
-	
+
 	# Configure for parallel processing
 	CORES=$(nproc)
 	echo "Starting pi-gen build process using $CORES CPU cores..."
-	
+
 	# Detect high-core systems and optimize accordingly
 	if [ $CORES -ge 16 ]; then
 		echo "🔥 High-core system detected! Using aggressive parallel processing..."
@@ -37,13 +37,13 @@ build_alpacapi () {
 		PARALLEL_JOBS=$CORES
 		PIP_JOBS=$CORES
 	fi
-	
+
 	# Set environment variables for parallel processing
 	export MAKEFLAGS="-j$MAKE_JOBS"
 	export MAKEOPTS="-j$MAKE_JOBS"
 	export PARALLEL_JOBS="$PARALLEL_JOBS"
 	export PIP_JOBS="$PIP_JOBS"
-	
+
 	# Run the build and capture output
 	if ! ./build-docker.sh; then
 		echo "Error: pi-gen build failed. Checking for errors..."

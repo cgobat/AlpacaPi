@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h> 
+#include <signal.h>
 
 
 #define Sleep(a) usleep((a)*1000)
@@ -21,9 +21,9 @@ void IntHandle(int i)
 
 int  main()
 {
-	
+
 	signal(SIGINT, IntHandle);
-	int EAF_count = EAFGetNum();  
+	int EAF_count = EAFGetNum();
 	if(EAF_count <= 0)
 	{
 		printf("no focuser connected, press any key to exit\n");
@@ -34,7 +34,7 @@ int  main()
 		printf("attached focuser :\n");
 
 	EAF_INFO EAFInfo;
-	
+
 
 	for(int i = 0; i < EAF_count; i++)
 	{
@@ -55,11 +55,11 @@ int  main()
 		getchar();
 		return -1;
 	}
-	
+
 	float fTemp;
    	EAFGetTemp(iSelectedID, &fTemp);
 	printf("temperatur=%g\n", fTemp);
-		
+
 	EAF_ERROR_CODE err;
 	while(1)
 	{
@@ -67,7 +67,7 @@ int  main()
 		if(err != EAF_ERROR_MOVING )
 			break;
 		Sleep(500);
-	} 
+	}
 
 	printf("Max step: %d", EAFInfo.MaxStep);
 
@@ -80,8 +80,8 @@ int  main()
 		if(err != EAF_SUCCESS || !bMoving)
 	    		break;
 		Sleep(500);
-	} 
-	
+	}
+
 	int currentPos;
 	EAFGetPosition(iSelectedID, &currentPos);
 	printf("\ncurrent position: %d\n", currentPos);
@@ -90,7 +90,7 @@ int  main()
 	char szInput[16];
 	printf("\nPlease input target position, type \'q\' to quit:\n");
 	while(1)
-	{	
+	{
 	//	safe_flush(stdin);
 		scanf("%s", szInput);
 
@@ -113,15 +113,15 @@ int  main()
 				printf("\nMove is aborted\n");
 				EAFStop(iSelectedID);
 			}
-			EAFGetPosition(iSelectedID, &currentPos);			
+			EAFGetPosition(iSelectedID, &currentPos);
 			printf("current position: %d\n", currentPos);
-			
+
 			bool pbHandControl;
 			err = EAFIsMoving(iSelectedID, &bMoving, &pbHandControl);
 			if(err != EAF_SUCCESS || !bMoving )
 					break;
 			Sleep(500);
-		} 
+		}
 
 		printf("\nPlease input target position, type \'q\' to quit:\n");
 
@@ -129,7 +129,7 @@ int  main()
 	EAFClose(iSelectedID);
 	printf("main function over\n");
 	return 0;
-	
+
 }
 
 
