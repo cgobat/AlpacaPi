@@ -130,16 +130,16 @@ if [ ! -d "QHY" ]; then
     cd QHY
     # Download appropriate version based on architecture
     if [ "$(uname -m)" = "aarch64" ]; then
-        wget https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_Arm64_20.06.26.tgz
-        tar -xzf sdk_Arm64_20.06.26.tgz
+        wget https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_Arm64_25.09.29.tgz
+        tar -xzf sdk_Arm64_25.09.29.tgz
         mv sdk*/* .
     elif [ "$(uname -m)" = "armv7l" ]; then
-        wget https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_arm32_20.06.26.tgz
-        tar -xzf sdk_arm32_20.06.26.tgz
+        wget https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_arm32_25.09.29.tgz
+        tar -xzf sdk_arm32_25.09.29.tgz
         mv sdk*/* .
     else
-        wget https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_linux64_20.06.26.tgz
-        tar -xzf sdk_linux64_20.06.26.tgz
+        wget https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_linux64_25.09.29.tgz
+        tar -xzf sdk_linux64_25.09.29.tgz
         mv sdk*/* .
     fi
     cd ..

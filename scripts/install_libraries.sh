@@ -228,10 +228,10 @@ fi
 }
 
 ###############################################################################
-# Latest versions as of Mar 18, 2021
-#		https://www.qhyccd.com/file/repository/publish/SDK/210201/sdk_linux64_21.02.01.tgz
-#		https://www.qhyccd.com/file/repository/publish/SDK/210201/sdk_Arm64_21.02.01.tgz
-#		https://www.qhyccd.com/file/repository/publish/SDK/210201/sdk_arm32_21.02.01.tgz
+# Latest stable versions as of May 30, 2026
+# https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_linux64_25.09.29.tgz
+# https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_Arm64_25.09.29.tgz
+# https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_arm32_25.09.29.tgz
 ###############################################################################
 function GetQHY()
 {
@@ -254,31 +254,28 @@ function GetQHY()
 				if  $ISX64
 				then
 					echo "Running on X64 platform"
-				#	QHY_TAR_FILE="sdk_linux64_21.02.01.tgz"
-					QHY_SUBDIR="200626"
-					QHY_TAR_FILE="sdk_linux64_20.06.26.tgz"
-				#	https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_linux64_20.06.26.tgz
+					QHY_SUBDIR="25.09.29"
+					QHY_TAR_FILE="sdk_linux64_25.09.29.tgz"
+				#	https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_linux64_25.09.29.tgz
 				elif  $ISARM64
 				then
 					echo "Running on ARM64 platform"
 				#	QHY_TAR_FILE="sdk_Arm64_21.02.01.tgz"
-					QHY_SUBDIR="200626"
-					QHY_TAR_FILE="sdk_Arm64_20.06.26.tgz"
-				#	https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_Arm64_20.06.26.tgz
+					QHY_SUBDIR="25.09.29"
+					QHY_TAR_FILE="sdk_Arm64_25.09.29.tgz"
+				#	https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_Arm64_25.09.29.tgz
 				elif  $ISARM32
 				then
 					echo "Running on ARM32 platform"
-				#	QHY_TAR_FILE="sdk_arm32_21.02.01.tgz"
-					QHY_SUBDIR="200626"
-					QHY_TAR_FILE="sdk_arm32_20.06.26.tgz"
-				#	https://www.qhyccd.com/file/repository/publish/SDK/200626/sdk_arm32_20.06.26.tgz
+					QHY_SUBDIR="25.09.29"
+					QHY_TAR_FILE="sdk_arm32_25.09.29.tgz"
+				#	https://www.qhyccd.com/file/repository/publish/SDK/25.09.29/sdk_arm32_25.09.29.tgz
 				else
 					exit
 				fi
 
 				cd $QHY_SDK_DIR
 				pwd
-			#	wget "https://www.qhyccd.com/file/repository/publish/SDK/210201/$QHY_TAR_FILE"
 				wget "https://www.qhyccd.com/file/repository/publish/SDK/$QHY_SUBDIR/$QHY_TAR_FILE"
 				ls -l
 				if [ -f $QHY_TAR_FILE ]
@@ -390,7 +387,6 @@ InstallATIK
 InstallToupTek
 InstallFlir
 InstallZWOEAF
-
 
 QHY_SDK_DIR="QHY"
 
