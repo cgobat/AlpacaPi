@@ -2,6 +2,12 @@ name: Build ARM64 Raspberry Pi image
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-arm64-image.yml"
+      - "alpacapi-builder/**"
 
 permissions:
   contents: read
@@ -37,7 +43,7 @@ jobs:
           docker system prune --all --force || true
           df -h
 
-      - name: Install pi-gen dependencies
+      - name: Install pi-gen host dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
@@ -63,6 +69,7 @@ jobs:
             qemu-user-static \
             quilt \
             rsync \
+            unzip \
             xz-utils \
             zerofree \
             zip
@@ -76,14 +83,12 @@ jobs:
 
       - name: Build ARM64 image with alpacapi-builder
         working-directory: alpacapi-builder
-        run: |
-          chmod +x build_arm64.sh common.sh
-          ./build_arm64.sh
+        run: ./build_arm64.sh
 
-      - name: List generated images
+      - name: List generated images and logs
         if: always()
         run: |
-          find alpacapi-builder -maxdepth 1 -type f -name "*-alpacapi-arm64.zip" -print -exec ls -lh {} \;
+          find alpacapi-builder -maxdepth 2 -type f \( -name "*-alpacapi-arm64.zip" -o -name "build.log" \) -print -exec ls -lh {} \;
 
       - name: Upload ARM64 image artifact
         uses: actions/upload-artifact@v7

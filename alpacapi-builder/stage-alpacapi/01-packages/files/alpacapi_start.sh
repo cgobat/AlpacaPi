@@ -1,13 +1,9 @@
 #!/bin/bash
+set -e
 
-# AlpacaPi startup script
-# This script starts the AlpacaPi service
+export VIRTUAL_ENV="/opt/alpacapi/venv"
+export PATH="${VIRTUAL_ENV}/bin:/home/alpacapi/AlpacaPi/build:/usr/local/bin:${PATH}"
+export LD_LIBRARY_PATH="/home/alpacapi/AlpacaPi/build:${LD_LIBRARY_PATH:-}"
 
 cd /home/alpacapi/AlpacaPi
-
-# Set environment variables
-export PATH="/home/alpacapi/AlpacaPi/build:$PATH"
-export LD_LIBRARY_PATH="/home/alpacapi/AlpacaPi/build:$LD_LIBRARY_PATH"
-
-# Start AlpacaPi
-exec /home/alpacapi/AlpacaPi/build/alpacapi
+exec /usr/local/bin/alpacapi
