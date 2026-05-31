@@ -4,28 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       source_repository:
-        description: "GitHub repository containing the AlpacaPi source to package"
-        required: true
-        default: "mconsidine/AlpacaPi"
+        description: Repository to build, owner/name
+        required: false
       source_ref:
-        description: "Branch, tag, or commit to build"
-        required: true
-        default: "master"
+        description: Branch, tag, or commit to build
+        required: false
       package_version:
-        description: "Optional Debian package version. Defaults to 0.1.<run_number>"
+        description: Optional Debian package version
         required: false
         default: ""
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/build-alpacapi-deb.yml"
-      - "alpacapi-builder/**"
-      - "scripts/**"
-      - "package.json"
-
-permissions:
-  contents: read
 
 jobs:
   build-deb-arm64:
@@ -34,12 +21,12 @@ jobs:
 
     env:
       DEBIAN_FRONTEND: noninteractive
-      SOURCE_REPOSITORY: ${{ github.event.inputs.source_repository || 'mconsidine/AlpacaPi' }}
-      SOURCE_REF: ${{ github.event.inputs.source_ref || 'openastro-alpaca' }}
-      PACKAGE_VERSION_INPUT: ${{ github.event.inputs.package_version || '' }}
+      SOURCE_REPOSITORY: ${{ inputs.source_repository || github.repository }}
+      SOURCE_REF: ${{ inputs.source_ref || github.ref_name }}
+      PACKAGE_VERSION_INPUT: ${{ inputs.package_version || '' }}
 
     steps:
-      - name: Check out packaging repository
+      - name: Check out repository
         uses: actions/checkout@v6
 
       - name: Show runner details
@@ -53,12 +40,12 @@ jobs:
           sudo systemctl start docker
           docker version
 
-      - name: Build Debian package in Debian trixie ARM64 container
+      - name: Build ARM64 Debian package
         run: |
           set -Eeuo pipefail
           mkdir -p dist
 
-          docker run --rm \
+          docker run --rm -i \
             --platform linux/arm64 \
             -e DEBIAN_FRONTEND=noninteractive \
             -e SOURCE_REPOSITORY="${SOURCE_REPOSITORY}" \
@@ -207,17 +194,17 @@ jobs:
             fi
           done
 
-          cat > "${pkg_root}/usr/bin/alpacapi_start.sh" <<'EOF'
+          cat > "${pkg_root}/usr/bin/alpacapi_start.sh" <<'EOF_SCRIPT'
           #!/bin/sh
           set -eu
           cd /var/lib/alpacapi
           exec /opt/alpacapi/bin/alpacapi "$@"
-          EOF
+          EOF_SCRIPT
           chmod 0755 "${pkg_root}/usr/bin/alpacapi_start.sh"
 
           ln -s ../bin/alpacapi_start.sh "${pkg_root}/usr/bin/alpacapi"
 
-          cat > "${pkg_root}/etc/alpacapi/alpacapi.conf" <<'EOF'
+          cat > "${pkg_root}/etc/alpacapi/alpacapi.conf" <<'EOF_CONFIG'
           [General]
           ServerPort=8000
           ServerHost=0.0.0.0
@@ -235,9 +222,9 @@ jobs:
           [FilterWheel]
           DefaultDriver=ZWO
           AutoDetect=true
-          EOF
+          EOF_CONFIG
 
-          cat > "${pkg_root}/etc/systemd/system/alpacapi.service" <<'EOF'
+          cat > "${pkg_root}/etc/systemd/system/alpacapi.service" <<'EOF_SERVICE'
           [Unit]
           Description=AlpacaPi Astronomy Control Software
           After=network-online.target
@@ -257,9 +244,9 @@ jobs:
 
           [Install]
           WantedBy=multi-user.target
-          EOF
+          EOF_SERVICE
 
-          cat > "${pkg_root}/etc/logrotate.d/alpacapi" <<'EOF'
+          cat > "${pkg_root}/etc/logrotate.d/alpacapi" <<'EOF_LOGROTATE'
           /var/log/alpacapi/*.log {
               daily
               missingok
@@ -269,9 +256,9 @@ jobs:
               notifempty
               create 0644 alpacapi alpacapi
           }
-          EOF
+          EOF_LOGROTATE
 
-          cat > "${pkg_root}/usr/share/doc/alpacapi/README.Debian" <<EOF
+          cat > "${pkg_root}/usr/share/doc/alpacapi/README.Debian" <<EOF_README
           AlpacaPi Debian package
           =======================
 
@@ -287,17 +274,16 @@ jobs:
           The package intentionally does not install optional vendor camera SDKs.
           Install those SDKs and udev rules separately when vendor-specific
           hardware support is required.
-          EOF
-
+          EOF_README
           gzip -9n "${pkg_root}/usr/share/doc/alpacapi/README.Debian"
 
-          cat > "${pkg_root}/DEBIAN/conffiles" <<'EOF'
+          cat > "${pkg_root}/DEBIAN/conffiles" <<'EOF_CONFFILES'
           /etc/alpacapi/alpacapi.conf
           /etc/logrotate.d/alpacapi
           /etc/systemd/system/alpacapi.service
-          EOF
+          EOF_CONFFILES
 
-          cat > "${pkg_root}/DEBIAN/postinst" <<'EOF'
+          cat > "${pkg_root}/DEBIAN/postinst" <<'EOF_POSTINST'
           #!/bin/sh
           set -e
 
@@ -324,9 +310,9 @@ jobs:
           fi
 
           exit 0
-          EOF
+          EOF_POSTINST
 
-          cat > "${pkg_root}/DEBIAN/prerm" <<'EOF'
+          cat > "${pkg_root}/DEBIAN/prerm" <<'EOF_PRERM'
           #!/bin/sh
           set -e
 
@@ -338,9 +324,9 @@ jobs:
           fi
 
           exit 0
-          EOF
+          EOF_PRERM
 
-          cat > "${pkg_root}/DEBIAN/postrm" <<'EOF'
+          cat > "${pkg_root}/DEBIAN/postrm" <<'EOF_POSTRM'
           #!/bin/sh
           set -e
 
@@ -349,7 +335,7 @@ jobs:
           fi
 
           exit 0
-          EOF
+          EOF_POSTRM
 
           chmod 0755 \
             "${pkg_root}/DEBIAN/postinst" \
@@ -358,7 +344,7 @@ jobs:
 
           shlib_deps=""
           mkdir -p /tmp/shlib/debian
-          cat > /tmp/shlib/debian/control <<'EOF'
+          cat > /tmp/shlib/debian/control <<'EOF_SHLIB_CONTROL'
           Source: alpacapi
           Section: astronomy
           Priority: optional
@@ -369,7 +355,7 @@ jobs:
           Architecture: any
           Description: AlpacaPi Astronomy Control Software
            AlpacaPi server package.
-          EOF
+          EOF_SHLIB_CONTROL
           if shlib_line="$(cd /tmp/shlib && dpkg-shlibdeps -O -e"${pkg_root}/opt/alpacapi/bin/alpacapi" 2>/tmp/shlib.err)"; then
             shlib_deps="$(printf '%s' "${shlib_line}" | sed 's/^shlibs:Depends=//')"
           else
@@ -384,7 +370,7 @@ jobs:
           fi
 
           installed_size="$(du -sk "${pkg_root}" | awk '{print $1}')"
-          cat > "${pkg_root}/DEBIAN/control" <<EOF
+          cat > "${pkg_root}/DEBIAN/control" <<EOF_CONTROL
           Package: ${package_name}
           Version: ${package_version}
           Section: astronomy
@@ -398,7 +384,12 @@ jobs:
            AlpacaPi provides ASCOM Alpaca-compatible astronomy control services.
            This package installs the server binary and a systemd service for use
            on an existing Debian or Raspberry Pi OS system.
-          EOF
+          EOF_CONTROL
+
+          # Normalize leading indentation introduced by YAML heredocs.
+          find "${pkg_root}" -type f \( -path "*/DEBIAN/*" -o -path "*/etc/*" -o -path "*/usr/bin/*" -o -path "*/usr/share/doc/*" \) \
+            -exec sed -i 's/^          //' {} +
+          sed -i 's/^          //' /tmp/shlib/debian/control
 
           dpkg-deb --root-owner-group --build "${pkg_root}" "/work/dist/${package_name}_${package_version}_${package_arch}.deb"
           dpkg-deb --info "/work/dist/${package_name}_${package_version}_${package_arch}.deb"
@@ -407,6 +398,12 @@ jobs:
           cd /work/dist
           sha256sum *.deb > SHA256SUMS
           BUILD_SCRIPT
+
+      - name: List package outputs
+        run: |
+          find dist -maxdepth 1 -type f -print -exec ls -lh {} \;
+          test -s dist/SHA256SUMS
+          test -n "$(find dist -maxdepth 1 -name '*.deb' -print -quit)"
 
       - name: Upload Debian package artifact
         uses: actions/upload-artifact@v7
