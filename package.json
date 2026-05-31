@@ -4,9 +4,9 @@
   "description": "Professional astronomy control software using the Alpaca protocol on Raspberry Pi",
   "main": "src/core/alpacapi.cpp",
   "scripts": {
-    "build:pi-image": "cd alpacapi-builder && ./build_alpacapi_arm64.sh",
-    "build:pi-image-armhf": "cd alpacapi-builder && ./build_alpacapi_armhf.sh",
-    "build:pi-image-arm64": "cd alpacapi-builder && ./build_alpacapi_arm64.sh",
+    "build:pi-image": "cd alpacapi-builder && ./build_arm64.sh",
+    "build:pi-image-armhf": "cd alpacapi-builder && ./build_armhf.sh",
+    "build:pi-image-arm64": "cd alpacapi-builder && ./build_arm64.sh",
     "clean": "rm -rf build/ && rm -rf alpacapi-builder/pi-gen-* && rm -f alpacapi-builder/*-alpacapi-*.zip",
     "install:dev": "npm install"
   },
