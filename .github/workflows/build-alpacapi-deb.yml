@@ -1,0 +1,418 @@
+name: Build AlpacaPi Debian package
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_repository:
+        description: "GitHub repository containing the AlpacaPi source to package"
+        required: true
+        default: "mconsidine/AlpacaPi"
+      source_ref:
+        description: "Branch, tag, or commit to build"
+        required: true
+        default: "master"
+      package_version:
+        description: "Optional Debian package version. Defaults to 0.1.<run_number>"
+        required: false
+        default: ""
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-alpacapi-deb.yml"
+      - "alpacapi-builder/**"
+      - "scripts/**"
+      - "package.json"
+
+permissions:
+  contents: read
+
+jobs:
+  build-deb-arm64:
+    name: Build ARM64 .deb
+    runs-on: ubuntu-24.04-arm
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      SOURCE_REPOSITORY: ${{ github.event.inputs.source_repository || 'mconsidine/AlpacaPi' }}
+      SOURCE_REF: ${{ github.event.inputs.source_ref || 'openastro-alpaca' }}
+      PACKAGE_VERSION_INPUT: ${{ github.event.inputs.package_version || '' }}
+
+    steps:
+      - name: Check out packaging repository
+        uses: actions/checkout@v6
+
+      - name: Show runner details
+        run: |
+          uname -a
+          lscpu
+          df -h
+
+      - name: Start Docker
+        run: |
+          sudo systemctl start docker
+          docker version
+
+      - name: Build Debian package in Debian trixie ARM64 container
+        run: |
+          set -Eeuo pipefail
+          mkdir -p dist
+
+          docker run --rm \
+            --platform linux/arm64 \
+            -e DEBIAN_FRONTEND=noninteractive \
+            -e SOURCE_REPOSITORY="${SOURCE_REPOSITORY}" \
+            -e SOURCE_REF="${SOURCE_REF}" \
+            -e PACKAGE_VERSION_INPUT="${PACKAGE_VERSION_INPUT}" \
+            -e GITHUB_RUN_NUMBER="${GITHUB_RUN_NUMBER}" \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            -w /work \
+            debian:trixie \
+            bash -s <<'BUILD_SCRIPT'
+          set -Eeuo pipefail
+
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            dpkg-dev \
+            file \
+            findutils \
+            g++ \
+            gcc \
+            git \
+            make \
+            pkg-config \
+            rsync \
+            sed \
+            tar \
+            xz-utils \
+            build-essential \
+            libusb-1.0-0-dev \
+            libudev-dev \
+            libopencv-dev \
+            libcfitsio-dev \
+            libnova-dev \
+            libgsl-dev \
+            libfftw3-dev \
+            libgphoto2-dev \
+            libjpeg-dev \
+            libtiff-dev \
+            libpng-dev \
+            libraw-dev \
+            libdc1394-dev \
+            libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev \
+            libavcodec-dev \
+            libavformat-dev \
+            libswscale-dev \
+            libv4l-dev \
+            libxvidcore-dev \
+            libx264-dev \
+            libgtk-3-dev \
+            libopenblas-dev \
+            python3 \
+            python3-venv \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel
+
+          src_dir="/tmp/alpacapi-src"
+          rm -rf "${src_dir}"
+          git clone --depth 1 --branch "${SOURCE_REF}" "https://github.com/${SOURCE_REPOSITORY}.git" "${src_dir}"
+
+          cd "${src_dir}"
+          build_jobs="$(nproc)"
+          echo "Building AlpacaPi from ${SOURCE_REPOSITORY}@${SOURCE_REF} with ${build_jobs} jobs"
+
+          if [ -f CMakeLists.txt ]; then
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --parallel "${build_jobs}"
+          elif [ -f Makefile ] || [ -f makefile ]; then
+            case "$(dpkg --print-architecture)" in
+              arm64)
+                make -j"${build_jobs}" pi64 || make -j"${build_jobs}" alpacapi || make -j"${build_jobs}"
+                ;;
+              armhf|armel)
+                make -j"${build_jobs}" pi || make -j"${build_jobs}" alpacapi || make -j"${build_jobs}"
+                ;;
+              *)
+                make -j"${build_jobs}" alpacapi || make -j"${build_jobs}"
+                ;;
+            esac
+          else
+            echo "No CMakeLists.txt or Makefile found in ${SOURCE_REPOSITORY}@${SOURCE_REF}" >&2
+            exit 1
+          fi
+
+          alpacapi_bin=""
+          for candidate in \
+            "${src_dir}/alpacapi" \
+            "${src_dir}/build/alpacapi" \
+            "${src_dir}/build/src/alpacapi" \
+            "${src_dir}/src/alpacapi"; do
+            if [ -x "${candidate}" ]; then
+              alpacapi_bin="${candidate}"
+              break
+            fi
+          done
+
+          if [ -z "${alpacapi_bin}" ]; then
+            alpacapi_bin="$(find "${src_dir}" -maxdepth 5 -type f -perm -111 -name alpacapi | head -1 || true)"
+          fi
+
+          if [ -z "${alpacapi_bin}" ] || [ ! -x "${alpacapi_bin}" ]; then
+            echo "Build completed, but no executable named 'alpacapi' was found." >&2
+            find "${src_dir}" -maxdepth 5 -type f -perm -111 -print >&2
+            exit 1
+          fi
+
+          if [ -n "${PACKAGE_VERSION_INPUT}" ]; then
+            package_version="${PACKAGE_VERSION_INPUT}"
+          else
+            package_version="0.1.${GITHUB_RUN_NUMBER}"
+          fi
+          package_version="$(printf '%s' "${package_version}" | sed 's/[^A-Za-z0-9.+:~_-]/-/g')"
+          package_arch="$(dpkg --print-architecture)"
+          package_name="alpacapi"
+          pkg_root="/tmp/${package_name}_${package_version}_${package_arch}"
+          rm -rf "${pkg_root}"
+
+          install -d \
+            "${pkg_root}/DEBIAN" \
+            "${pkg_root}/etc/alpacapi" \
+            "${pkg_root}/etc/logrotate.d" \
+            "${pkg_root}/etc/systemd/system" \
+            "${pkg_root}/opt/alpacapi/bin" \
+            "${pkg_root}/usr/bin" \
+            "${pkg_root}/usr/share/doc/alpacapi" \
+            "${pkg_root}/var/lib/alpacapi" \
+            "${pkg_root}/var/log/alpacapi"
+
+          install -m 0755 "${alpacapi_bin}" "${pkg_root}/opt/alpacapi/bin/alpacapi"
+
+          for extra in \
+            alpacapi-calib \
+            alpacapi-expsci \
+            camera \
+            client \
+            domectrl \
+            focuser \
+            ror \
+            skytravel \
+            switch; do
+            candidate="${src_dir}/${extra}"
+            if [ -x "${candidate}" ]; then
+              install -m 0755 "${candidate}" "${pkg_root}/opt/alpacapi/bin/${extra}"
+            fi
+          done
+
+          cat > "${pkg_root}/usr/bin/alpacapi_start.sh" <<'EOF'
+          #!/bin/sh
+          set -eu
+          cd /var/lib/alpacapi
+          exec /opt/alpacapi/bin/alpacapi "$@"
+          EOF
+          chmod 0755 "${pkg_root}/usr/bin/alpacapi_start.sh"
+
+          ln -s ../bin/alpacapi_start.sh "${pkg_root}/usr/bin/alpacapi"
+
+          cat > "${pkg_root}/etc/alpacapi/alpacapi.conf" <<'EOF'
+          [General]
+          ServerPort=8000
+          ServerHost=0.0.0.0
+          LogLevel=INFO
+          LogFile=/var/log/alpacapi/alpacapi.log
+
+          [Camera]
+          DefaultDriver=ZWO
+          AutoDetect=true
+
+          [Focuser]
+          DefaultDriver=ZWO
+          AutoDetect=true
+
+          [FilterWheel]
+          DefaultDriver=ZWO
+          AutoDetect=true
+          EOF
+
+          cat > "${pkg_root}/etc/systemd/system/alpacapi.service" <<'EOF'
+          [Unit]
+          Description=AlpacaPi Astronomy Control Software
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          User=alpacapi
+          Group=alpacapi
+          WorkingDirectory=/var/lib/alpacapi
+          Environment=ALPACAPI_CONFIG=/etc/alpacapi/alpacapi.conf
+          ExecStart=/usr/bin/alpacapi_start.sh
+          Restart=always
+          RestartSec=10
+          StandardOutput=journal
+          StandardError=journal
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          cat > "${pkg_root}/etc/logrotate.d/alpacapi" <<'EOF'
+          /var/log/alpacapi/*.log {
+              daily
+              missingok
+              rotate 7
+              compress
+              delaycompress
+              notifempty
+              create 0644 alpacapi alpacapi
+          }
+          EOF
+
+          cat > "${pkg_root}/usr/share/doc/alpacapi/README.Debian" <<EOF
+          AlpacaPi Debian package
+          =======================
+
+          This package installs the AlpacaPi server binary, a system user, a
+          default configuration file at /etc/alpacapi/alpacapi.conf, and a
+          systemd unit named alpacapi.service.
+
+          Start or stop the service with:
+
+              sudo systemctl start alpacapi.service
+              sudo systemctl stop alpacapi.service
+
+          The package intentionally does not install optional vendor camera SDKs.
+          Install those SDKs and udev rules separately when vendor-specific
+          hardware support is required.
+          EOF
+
+          gzip -9n "${pkg_root}/usr/share/doc/alpacapi/README.Debian"
+
+          cat > "${pkg_root}/DEBIAN/conffiles" <<'EOF'
+          /etc/alpacapi/alpacapi.conf
+          /etc/logrotate.d/alpacapi
+          /etc/systemd/system/alpacapi.service
+          EOF
+
+          cat > "${pkg_root}/DEBIAN/postinst" <<'EOF'
+          #!/bin/sh
+          set -e
+
+          if ! getent group alpacapi >/dev/null; then
+              addgroup --system alpacapi
+          fi
+
+          if ! getent passwd alpacapi >/dev/null; then
+              adduser --system \
+                  --ingroup alpacapi \
+                  --home /var/lib/alpacapi \
+                  --no-create-home \
+                  --disabled-login \
+                  --gecos "AlpacaPi service user" \
+                  alpacapi
+          fi
+
+          mkdir -p /var/lib/alpacapi /var/log/alpacapi
+          chown -R alpacapi:alpacapi /var/lib/alpacapi /var/log/alpacapi
+
+          if command -v systemctl >/dev/null 2>&1; then
+              systemctl daemon-reload || true
+              systemctl enable alpacapi.service || true
+          fi
+
+          exit 0
+          EOF
+
+          cat > "${pkg_root}/DEBIAN/prerm" <<'EOF'
+          #!/bin/sh
+          set -e
+
+          if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ]; then
+              if command -v systemctl >/dev/null 2>&1; then
+                  systemctl stop alpacapi.service || true
+                  systemctl disable alpacapi.service || true
+              fi
+          fi
+
+          exit 0
+          EOF
+
+          cat > "${pkg_root}/DEBIAN/postrm" <<'EOF'
+          #!/bin/sh
+          set -e
+
+          if command -v systemctl >/dev/null 2>&1; then
+              systemctl daemon-reload || true
+          fi
+
+          exit 0
+          EOF
+
+          chmod 0755 \
+            "${pkg_root}/DEBIAN/postinst" \
+            "${pkg_root}/DEBIAN/prerm" \
+            "${pkg_root}/DEBIAN/postrm"
+
+          shlib_deps=""
+          mkdir -p /tmp/shlib/debian
+          cat > /tmp/shlib/debian/control <<'EOF'
+          Source: alpacapi
+          Section: astronomy
+          Priority: optional
+          Maintainer: AlpacaPi Maintainers <noreply@example.invalid>
+          Standards-Version: 4.7.0
+
+          Package: alpacapi
+          Architecture: any
+          Description: AlpacaPi Astronomy Control Software
+           AlpacaPi server package.
+          EOF
+          if shlib_line="$(cd /tmp/shlib && dpkg-shlibdeps -O -e"${pkg_root}/opt/alpacapi/bin/alpacapi" 2>/tmp/shlib.err)"; then
+            shlib_deps="$(printf '%s' "${shlib_line}" | sed 's/^shlibs:Depends=//')"
+          else
+            cat /tmp/shlib.err >&2 || true
+          fi
+
+          manual_deps="adduser, systemd"
+          if [ -n "${shlib_deps}" ]; then
+            depends="${manual_deps}, ${shlib_deps}"
+          else
+            depends="${manual_deps}, libc6, libstdc++6, libgcc-s1"
+          fi
+
+          installed_size="$(du -sk "${pkg_root}" | awk '{print $1}')"
+          cat > "${pkg_root}/DEBIAN/control" <<EOF
+          Package: ${package_name}
+          Version: ${package_version}
+          Section: astronomy
+          Priority: optional
+          Architecture: ${package_arch}
+          Maintainer: AlpacaPi Maintainers <noreply@example.invalid>
+          Depends: ${depends}
+          Installed-Size: ${installed_size}
+          Homepage: https://github.com/${SOURCE_REPOSITORY}
+          Description: AlpacaPi Astronomy Control Software
+           AlpacaPi provides ASCOM Alpaca-compatible astronomy control services.
+           This package installs the server binary and a systemd service for use
+           on an existing Debian or Raspberry Pi OS system.
+          EOF
+
+          dpkg-deb --root-owner-group --build "${pkg_root}" "/work/dist/${package_name}_${package_version}_${package_arch}.deb"
+          dpkg-deb --info "/work/dist/${package_name}_${package_version}_${package_arch}.deb"
+          dpkg-deb --contents "/work/dist/${package_name}_${package_version}_${package_arch}.deb" | sed -n '1,80p'
+
+          cd /work/dist
+          sha256sum *.deb > SHA256SUMS
+          BUILD_SCRIPT
+
+      - name: Upload Debian package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: alpacapi-deb-arm64
+          path: |
+            dist/*.deb
+            dist/SHA256SUMS
+          if-no-files-found: error
